@@ -36,9 +36,11 @@ export class InputManager {
   private setupEventListeners(): void {
     // Board canvas events
     this.boardCanvas.addEventListener('mousedown', this.handleMouseDown.bind(this));
-    this.boardCanvas.addEventListener('mousemove', this.handleMouseMove.bind(this));
     this.boardCanvas.addEventListener('mouseup', this.handleMouseUp.bind(this));
-    this.boardCanvas.addEventListener('mouseleave', this.handleMouseLeave.bind(this));
+
+    // Global mouse events for drag tracking (works even when cursor leaves canvas)
+    document.addEventListener('mousemove', this.handleMouseMove.bind(this));
+    document.addEventListener('mouseup', this.handleMouseUp.bind(this));
 
     // Touch events for mobile
     this.boardCanvas.addEventListener('touchstart', this.handleTouchStart.bind(this), { passive: false });
@@ -82,10 +84,6 @@ export class InputManager {
     if (result && this.onPiecePlaced) {
       this.onPiecePlaced(result.piece, result.row, result.col);
     }
-  }
-
-  private handleMouseLeave(event: MouseEvent): void {
-    this.dragHandler.cancelDrag();
   }
 
   private handleTouchStart(event: TouchEvent): void {
