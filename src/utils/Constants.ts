@@ -4,11 +4,11 @@ export const GRID_CONFIG = {
   ROWS: 18,
   COLS: 12,
 
-  // Desktop: Board takes ~30% of screen height
-  DESKTOP_BOARD_HEIGHT_RATIO: 0.3,
+  // Desktop: Board takes ~45% of screen height (50% increase from 30%)
+  DESKTOP_BOARD_HEIGHT_RATIO: 0.45,
 
-  // Mobile: Board takes ~60% of screen height
-  MOBILE_BOARD_HEIGHT_RATIO: 0.6,
+  // Mobile: Board takes ~90% of screen height (50% increase from 60%)
+  MOBILE_BOARD_HEIGHT_RATIO: 0.9,
 
   // Breakpoint
   MOBILE_BREAKPOINT: 768,

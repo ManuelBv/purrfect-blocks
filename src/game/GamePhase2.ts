@@ -51,9 +51,17 @@ export class Game {
     this.effectsRenderer = new EffectsRenderer(effectsCanvas, cellSize);
     this.hudRenderer = new HUDRenderer();
 
-    // Setup canvas sizes for effects
-    effectsCanvas.width = boardCanvas.width;
-    effectsCanvas.height = boardCanvas.height;
+    // Setup canvas sizes for effects - cover entire game area (board + panel)
+    const gameArea = document.querySelector('.game-area') as HTMLElement;
+    if (gameArea) {
+      const rect = gameArea.getBoundingClientRect();
+      effectsCanvas.width = rect.width;
+      effectsCanvas.height = rect.height;
+
+      // Position effects canvas to cover entire game area
+      effectsCanvas.style.width = `${rect.width}px`;
+      effectsCanvas.style.height = `${rect.height}px`;
+    }
 
     // Setup input
     this.inputManager = new InputManager(boardCanvas, cellSize);
@@ -128,28 +136,46 @@ export class Game {
       const effectsCtx = this.effectsRenderer['ctx'];
       const cellSize = this.boardRenderer.getCellSize();
 
-      // Clear effects canvas for fresh ghost preview
-      effectsCtx.clearRect(0, 0, boardCanvas.width, boardCanvas.height);
+      // Clear entire effects canvas
+      effectsCtx.clearRect(0, 0, effectsCtx.canvas.width, effectsCtx.canvas.height);
 
-      // Draw ghost preview on board
-      GhostPreview.render(
-        effectsCtx,
-        dragState.piece.shape,
-        dragState.gridRow,
-        dragState.gridCol,
-        cellSize,
-        dragState.isValid
-      );
+      // Calculate board position within game area
+      const gameArea = document.querySelector('.game-area') as HTMLElement;
+      const gameContainer = document.querySelector('.game-container') as HTMLElement;
 
-      // Draw piece following cursor
-      PieceRenderer.renderPiece(
-        effectsCtx,
-        dragState.piece,
-        dragState.currentX - cellSize,
-        dragState.currentY - cellSize,
-        cellSize,
-        0.8
-      );
+      if (gameArea && gameContainer) {
+        const gameAreaRect = gameArea.getBoundingClientRect();
+        const containerRect = gameContainer.getBoundingClientRect();
+
+        // Offset of board canvas within game area
+        const boardOffsetX = containerRect.left - gameAreaRect.left + 20; // +20 for container padding
+        const boardOffsetY = containerRect.top - gameAreaRect.top + 20;
+
+        // Draw ghost preview on board (accounting for offset)
+        effectsCtx.save();
+        effectsCtx.translate(boardOffsetX, boardOffsetY);
+
+        GhostPreview.render(
+          effectsCtx,
+          dragState.piece.shape,
+          dragState.gridRow,
+          dragState.gridCol,
+          cellSize,
+          dragState.isValid
+        );
+
+        effectsCtx.restore();
+
+        // Draw piece following cursor (in game-area coordinates)
+        PieceRenderer.renderPiece(
+          effectsCtx,
+          dragState.piece,
+          dragState.currentX + boardOffsetX - cellSize,
+          dragState.currentY + boardOffsetY - cellSize,
+          cellSize,
+          0.8
+        );
+      }
     }
   }
 
