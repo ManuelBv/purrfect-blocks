@@ -51,9 +51,8 @@ export class Game {
     this.effectsRenderer = new EffectsRenderer(effectsCanvas, cellSize);
     this.hudRenderer = new HUDRenderer();
 
-    // Setup canvas sizes for effects - same as board canvas
-    effectsCanvas.width = boardCanvas.width;
-    effectsCanvas.height = boardCanvas.height;
+    // Setup effects canvas to cover entire game area
+    this.setupEffectsCanvas(effectsCanvas);
 
     // Setup input
     this.inputManager = new InputManager(boardCanvas, cellSize);
@@ -69,6 +68,23 @@ export class Game {
     this.animationLoop = new AnimationLoop(this.update.bind(this));
 
     this.init();
+  }
+
+  private setupEffectsCanvas(canvas: HTMLCanvasElement): void {
+    const gameArea = document.querySelector('.game-area') as HTMLElement;
+    if (!gameArea) return;
+
+    const rect = gameArea.getBoundingClientRect();
+
+    // Size canvas to cover entire game area
+    canvas.width = rect.width;
+    canvas.height = rect.height;
+
+    // Position canvas over game area using fixed positioning
+    canvas.style.left = `${rect.left}px`;
+    canvas.style.top = `${rect.top}px`;
+    canvas.style.width = `${rect.width}px`;
+    canvas.style.height = `${rect.height}px`;
   }
 
   private init(): void {
@@ -124,32 +140,52 @@ export class Game {
     const dragState = this.inputManager.getDragHandler().getDragState();
 
     if (dragState.isDragging && dragState.piece) {
-      const boardCanvas = this.boardRenderer['ctx'].canvas;
       const effectsCtx = this.effectsRenderer['ctx'];
       const cellSize = this.boardRenderer.getCellSize();
 
-      // Clear effects canvas
-      effectsCtx.clearRect(0, 0, boardCanvas.width, boardCanvas.height);
+      // Clear entire effects canvas
+      effectsCtx.clearRect(0, 0, effectsCtx.canvas.width, effectsCtx.canvas.height);
 
-      // Draw ghost preview on board
-      GhostPreview.render(
-        effectsCtx,
-        dragState.piece.shape,
-        dragState.gridRow,
-        dragState.gridCol,
-        cellSize,
-        dragState.isValid
-      );
+      // Get positions for coordinate transformation
+      const gameArea = document.querySelector('.game-area') as HTMLElement;
+      const gameContainer = document.querySelector('.game-container') as HTMLElement;
+      const boardCanvas = this.boardRenderer['ctx'].canvas;
 
-      // Draw piece following cursor
-      PieceRenderer.renderPiece(
-        effectsCtx,
-        dragState.piece,
-        dragState.currentX - cellSize,
-        dragState.currentY - cellSize,
-        cellSize,
-        0.8
-      );
+      if (gameArea && gameContainer) {
+        const gameAreaRect = gameArea.getBoundingClientRect();
+        const containerRect = gameContainer.getBoundingClientRect();
+        const boardRect = boardCanvas.getBoundingClientRect();
+
+        // Calculate board offset within effects canvas
+        const boardOffsetX = boardRect.left - gameAreaRect.left;
+        const boardOffsetY = boardRect.top - gameAreaRect.top;
+
+        // Draw ghost preview on board (with offset)
+        effectsCtx.save();
+        effectsCtx.translate(boardOffsetX, boardOffsetY);
+
+        GhostPreview.render(
+          effectsCtx,
+          dragState.piece.shape,
+          dragState.gridRow,
+          dragState.gridCol,
+          cellSize,
+          dragState.isValid
+        );
+
+        effectsCtx.restore();
+
+        // Draw piece following cursor (in game-area space)
+        // dragState coordinates are relative to board canvas, so add board offset
+        PieceRenderer.renderPiece(
+          effectsCtx,
+          dragState.piece,
+          dragState.currentX + boardOffsetX - cellSize,
+          dragState.currentY + boardOffsetY - cellSize,
+          cellSize,
+          0.8
+        );
+      }
     }
   }
 

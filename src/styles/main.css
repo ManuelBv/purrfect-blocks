@@ -58,7 +58,7 @@ h1 {
 
 /* Canvas stack for layering */
 .canvas-stack {
-  position: relative;
+  position: static;
   display: inline-block;
 }
 
@@ -73,11 +73,10 @@ h1 {
 }
 
 #effects-canvas {
-  position: absolute;
-  top: 0;
-  left: 0;
+  position: fixed;
   pointer-events: none;
-  /* Will be sized dynamically to cover entire game-area */
+  z-index: 100;
+  /* Will be positioned and sized dynamically to cover entire game-area */
 }
 
 /* Piece panel */
