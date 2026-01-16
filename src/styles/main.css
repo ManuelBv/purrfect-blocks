@@ -59,11 +59,11 @@ h1 {
 .game-canvas {
   display: block;
   border: 3px solid var(--color-espresso);
-  border-radius: 8px;
 }
 
 #board-canvas {
   cursor: crosshair;
+  border-radius: 0;
 }
 
 .effects-overlay {

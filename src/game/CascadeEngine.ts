@@ -26,10 +26,7 @@ export class CascadeEngine {
       board.clearLines(completeLines.rows, completeLines.cols);
       totalLinesCleared += linesThisPass;
 
-      // 3. Apply gravity
-      board.applyGravity();
-
-      // 4. Increment cascade level
+      // 3. Increment cascade level (no gravity - blocks stay in place)
       this.cascadeLevel++;
     }
 
