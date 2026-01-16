@@ -21,6 +21,8 @@ export class ClearAnimationManager {
     this.animations = [];
     const currentTime = Date.now();
 
+    console.log('scheduleClearing called with', rows.length, 'rows and', cols.length, 'cols');
+
     // Create a map of all blocks to clear with their timing
     const clearMap = new Map<string, { row: number; col: number; delay: number; color: string }>();
 
@@ -29,7 +31,7 @@ export class ClearAnimationManager {
       for (let col = 0; col < 12; col++) {
         const key = `${rowIndex},${col}`;
         const cell = board.getCell(rowIndex, col);
-        if (cell && cell.filled) {
+        if (cell && cell.occupied) {
           const existingEntry = clearMap.get(key);
           const delay = col * this.staggerDelay;
 
@@ -51,7 +53,7 @@ export class ClearAnimationManager {
       for (let row = 0; row < 18; row++) {
         const key = `${row},${colIndex}`;
         const cell = board.getCell(row, colIndex);
-        if (cell && cell.filled) {
+        if (cell && cell.occupied) {
           const existingEntry = clearMap.get(key);
           const delay = row * this.staggerDelay;
 
@@ -78,6 +80,10 @@ export class ClearAnimationManager {
         color
       });
     });
+
+    console.log('Created', this.animations.length, 'animations');
+    console.log('Animation duration per block:', this.animationDuration, 'ms');
+    console.log('Stagger delay:', this.staggerDelay, 'ms');
   }
 
   /**

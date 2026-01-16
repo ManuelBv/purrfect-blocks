@@ -280,12 +280,21 @@ export class Game {
         break;
       }
 
+      console.log('Starting clear animation for', lines.rows.length, 'rows and', lines.cols.length, 'cols');
+
       // Schedule the clear animation
       this.clearAnimationManager.scheduleClearing(lines.rows, lines.cols, this.board);
 
       // Wait for animation to complete
       const animDuration = this.clearAnimationManager.getTotalDuration();
-      await this.delay(animDuration);
+      console.log('Animation duration:', animDuration, 'ms');
+
+      // Wait while animation is playing
+      const startTime = Date.now();
+      while (this.clearAnimationManager.isAnimating()) {
+        await this.delay(16); // Wait one frame
+      }
+      console.log('Animation completed after', Date.now() - startTime, 'ms');
 
       // Actually clear the lines from the board
       const linesCleared = this.cascadeEngine.clearLines(this.board, lines);
