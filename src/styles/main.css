@@ -1,0 +1,124 @@
+/* Purrfect Blocks Styles */
+
+:root {
+  --color-espresso: #3E2723;
+  --color-burnt-orange: #D84315;
+  --color-cream: #FFF8E1;
+  --color-mocha: #6D4C41;
+  --color-caramel: #A1887F;
+  --color-latte: #BCAAA4;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Arial', sans-serif;
+  background: linear-gradient(135deg, var(--color-caramel) 0%, var(--color-mocha) 100%);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-espresso);
+}
+
+#app {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 2.5rem;
+  color: var(--color-cream);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.game-container {
+  background: var(--color-cream);
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+#game-canvas {
+  display: block;
+  border: 3px solid var(--color-espresso);
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.hud {
+  display: flex;
+  gap: 30px;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 10px;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.hud-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.hud-label {
+  font-size: 0.9rem;
+  color: var(--color-mocha);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.hud-value {
+  font-size: 1.5rem;
+  color: var(--color-espresso);
+}
+
+button {
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: bold;
+  color: var(--color-cream);
+  background: linear-gradient(135deg, var(--color-burnt-orange) 0%, var(--color-mocha) 100%);
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* Mobile responsiveness */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 2rem;
+  }
+
+  .hud {
+    font-size: 1rem;
+    gap: 15px;
+  }
+
+  .hud-value {
+    font-size: 1.2rem;
+  }
+}

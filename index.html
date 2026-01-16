@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Purrfect Blocks - Cozy Block Puzzle Game</title>
+  <meta name="description" content="A cozy block puzzle game with cats and coffee vibes">
+</head>
+<body>
+  <div id="app">
+    <h1>Purrfect Blocks 🐱☕</h1>
+
+    <div class="hud">
+      <div class="hud-item">
+        <span class="hud-label">Score</span>
+        <span class="hud-value" id="score">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Combo</span>
+        <span class="hud-value" id="combo">1.0x</span>
+      </div>
+    </div>
+
+    <div class="game-container">
+      <canvas id="game-canvas"></canvas>
+    </div>
+
+    <button id="restart-btn">Restart Game</button>
+
+    <div style="color: var(--color-cream); text-align: center; margin-top: 20px;">
+      <p>Click on the board to place pieces!</p>
+      <p style="font-size: 0.9rem; margin-top: 10px;">Phase 1: Foundation</p>
+    </div>
+  </div>
+
+  <script type="module" src="/src/main.ts"></script>
+</body>
+</html>
