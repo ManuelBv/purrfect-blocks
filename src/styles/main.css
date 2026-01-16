@@ -56,12 +56,6 @@ h1 {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-/* Canvas stack for layering */
-.canvas-stack {
-  position: static;
-  display: inline-block;
-}
-
 .game-canvas {
   display: block;
   border: 3px solid var(--color-espresso);
@@ -72,11 +66,13 @@ h1 {
   cursor: crosshair;
 }
 
-#effects-canvas {
-  position: fixed;
+.effects-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
   pointer-events: none;
-  z-index: 100;
-  /* Will be positioned and sized dynamically to cover entire game-area */
+  z-index: 10;
+  /* Sized dynamically to cover entire game-area */
 }
 
 /* Piece panel */

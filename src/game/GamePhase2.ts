@@ -74,15 +74,12 @@ export class Game {
     const gameArea = document.querySelector('.game-area') as HTMLElement;
     if (!gameArea) return;
 
+    // Get the actual dimensions of the game area
     const rect = gameArea.getBoundingClientRect();
 
     // Size canvas to cover entire game area
     canvas.width = rect.width;
     canvas.height = rect.height;
-
-    // Position canvas over game area using fixed positioning
-    canvas.style.left = `${rect.left}px`;
-    canvas.style.top = `${rect.top}px`;
     canvas.style.width = `${rect.width}px`;
     canvas.style.height = `${rect.height}px`;
   }
@@ -146,17 +143,15 @@ export class Game {
       // Clear entire effects canvas
       effectsCtx.clearRect(0, 0, effectsCtx.canvas.width, effectsCtx.canvas.height);
 
-      // Get positions for coordinate transformation
+      // Get board canvas position within game area
       const gameArea = document.querySelector('.game-area') as HTMLElement;
-      const gameContainer = document.querySelector('.game-container') as HTMLElement;
       const boardCanvas = this.boardRenderer['ctx'].canvas;
 
-      if (gameArea && gameContainer) {
+      if (gameArea && boardCanvas) {
         const gameAreaRect = gameArea.getBoundingClientRect();
-        const containerRect = gameContainer.getBoundingClientRect();
         const boardRect = boardCanvas.getBoundingClientRect();
 
-        // Calculate board offset within effects canvas
+        // Calculate board offset within game area (effects canvas coordinates)
         const boardOffsetX = boardRect.left - gameAreaRect.left;
         const boardOffsetY = boardRect.top - gameAreaRect.top;
 
