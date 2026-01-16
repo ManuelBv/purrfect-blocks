@@ -17,19 +17,27 @@
       </div>
       <div class="hud-item">
         <span class="hud-label">Combo</span>
-        <span class="hud-value" id="combo">1.0x</span>
+        <span class="hud-value combo-value" id="combo">1.0x</span>
       </div>
     </div>
 
     <div class="game-container">
-      <canvas id="game-canvas"></canvas>
+      <div class="canvas-stack">
+        <canvas id="board-canvas" class="game-canvas"></canvas>
+        <canvas id="effects-canvas" class="game-canvas effects-layer"></canvas>
+      </div>
+    </div>
+
+    <div class="panel-container">
+      <p class="panel-label">Select a piece:</p>
+      <canvas id="panel-canvas"></canvas>
     </div>
 
     <button id="restart-btn">Restart Game</button>
 
-    <div style="color: var(--color-cream); text-align: center; margin-top: 20px;">
-      <p>Click on the board to place pieces!</p>
-      <p style="font-size: 0.9rem; margin-top: 10px;">Phase 1: Foundation</p>
+    <div class="instructions">
+      <p>🎮 Click a piece, then drag it to the board!</p>
+      <p class="phase-info">Phase 2: Drag & Drop</p>
     </div>
   </div>
 

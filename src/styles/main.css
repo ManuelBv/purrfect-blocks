@@ -47,11 +47,119 @@ h1 {
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
 }
 
-#game-canvas {
+/* Canvas stack for layering */
+.canvas-stack {
+  position: relative;
+  display: inline-block;
+}
+
+.game-canvas {
   display: block;
   border: 3px solid var(--color-espresso);
   border-radius: 8px;
+}
+
+#board-canvas {
+  cursor: crosshair;
+}
+
+#effects-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
+/* Piece panel */
+.panel-container {
+  background: rgba(255, 255, 255, 0.9);
+  padding: 15px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.panel-label {
+  text-align: center;
+  color: var(--color-mocha);
+  font-size: 0.9rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  margin-bottom: 10px;
+}
+
+#panel-canvas {
+  display: block;
   cursor: pointer;
+  border-radius: 8px;
+}
+
+/* Instructions */
+.instructions {
+  color: var(--color-cream);
+  text-align: center;
+  margin-top: 10px;
+}
+
+.instructions p {
+  margin: 5px 0;
+}
+
+.phase-info {
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+/* Combo animation */
+.combo-value.combo-active {
+  animation: pulse 0.5s ease-in-out;
+  color: var(--color-burnt-orange);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+
+/* Game messages */
+.game-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--color-burnt-orange);
+  color: var(--color-cream);
+  padding: 20px 40px;
+  border-radius: 10px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  animation: fadeInOut 2s ease-in-out;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  20% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  80% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.8);
+  }
 }
 
 .hud {
