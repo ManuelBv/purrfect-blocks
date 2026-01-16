@@ -1,12 +1,40 @@
 // Handles falling blocks and chain reactions
 
 import type { GameBoard } from './GameBoard';
-import type { CascadeResult } from '../types/GameTypes';
+import type { CascadeResult, CompleteLines } from '../types/GameTypes';
 import { LineDetector } from './LineDetector';
 
 export class CascadeEngine {
   private cascadeLevel: number = 0;
 
+  /**
+   * Detect lines that need to be cleared (does not clear them)
+   * Returns null if no lines to clear
+   */
+  detectLines(board: GameBoard): CompleteLines | null {
+    const completeLines = board.getCompleteLines();
+    const linesCount = completeLines.rows.length + completeLines.cols.length;
+
+    if (linesCount === 0) {
+      return null;
+    }
+
+    return completeLines;
+  }
+
+  /**
+   * Actually clear the detected lines from the board
+   */
+  clearLines(board: GameBoard, lines: CompleteLines): number {
+    const linesCleared = lines.rows.length + lines.cols.length;
+    board.clearLines(lines.rows, lines.cols);
+    this.cascadeLevel++;
+    return linesCleared;
+  }
+
+  /**
+   * Original method kept for compatibility, but now instant (no animation)
+   */
   processCascade(board: GameBoard): CascadeResult {
     let totalLinesCleared = 0;
     this.cascadeLevel = 0;

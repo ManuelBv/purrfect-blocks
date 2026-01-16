@@ -12,6 +12,7 @@ import { AnimationLoop } from '../rendering/AnimationLoop';
 import { InputManager } from '../input/InputManager';
 import { PieceRenderer } from '../rendering/PieceRenderer';
 import { GhostPreview } from '../input/GhostPreview';
+import { ClearAnimationManager } from '../rendering/ClearAnimationManager';
 import { GameState } from '../types/GameTypes';
 import type { VisualEffect } from '../types/RenderTypes';
 import type { Piece } from '../pieces/Piece';
@@ -32,6 +33,7 @@ export class Game {
   private gameState: GameState = GameState.LOADING;
   private effects: VisualEffect[] = [];
   private animatingCascade: boolean = false;
+  private clearAnimationManager: ClearAnimationManager;
 
   constructor(
     boardCanvas: HTMLCanvasElement,
@@ -50,6 +52,7 @@ export class Game {
     this.panelRenderer = new PanelRenderer(panelCanvas, cellSize);
     this.effectsRenderer = new EffectsRenderer(effectsCanvas, cellSize);
     this.hudRenderer = new HUDRenderer();
+    this.clearAnimationManager = new ClearAnimationManager();
 
     // Setup effects canvas to cover entire game area
     this.setupEffectsCanvas(effectsCanvas);
@@ -113,8 +116,8 @@ export class Game {
   }
 
   private render(): void {
-    // Render board
-    this.boardRenderer.render(this.board.getCells());
+    // Render board with clear animations
+    this.renderBoardWithAnimations();
 
     // Render piece panel
     this.panelRenderer.render(
@@ -131,6 +134,36 @@ export class Game {
     // Update HUD
     this.hudRenderer.updateScore(this.scoreManager.getScore());
     this.hudRenderer.updateCombo(this.scoreManager.getComboMultiplier());
+  }
+
+  private renderBoardWithAnimations(): void {
+    const cells = this.board.getCells();
+    const ctx = this.boardRenderer['ctx'];
+    const cellSize = this.boardRenderer.getCellSize();
+
+    // Clear and draw grid
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    this.boardRenderer['drawGrid']();
+
+    // Draw all cells
+    for (let r = 0; r < cells.length; r++) {
+      for (let c = 0; c < cells[r].length; c++) {
+        const cell = cells[r][c];
+
+        if (cell.occupied && cell.color) {
+          const progress = this.clearAnimationManager.getBlockProgress(r, c);
+
+          if (progress !== null && progress < 1) {
+            // Cell is animating - draw with break animation
+            this.boardRenderer.drawCellWithAnimation(r, c, cell.color, progress);
+          } else if (progress === null) {
+            // Cell is not animating - draw normally
+            this.boardRenderer['drawCell'](r, c, cell.color);
+          }
+          // If progress === 1, cell is fully cleared, don't draw
+        }
+      }
+    }
   }
 
   private renderDraggedPiece(): void {
@@ -230,18 +263,49 @@ export class Game {
 
   private async processCascadeWithAnimation(): Promise<void> {
     this.animatingCascade = true;
+    this.cascadeEngine.reset();
 
     // Add a brief delay to show the placed piece
     await this.delay(200);
 
-    const result = this.cascadeEngine.processCascade(this.board);
+    let totalLinesCleared = 0;
 
-    if (result.totalLinesCleared > 0) {
-      const score = this.scoreManager.addScore(result.totalLinesCleared, result.cascadeLevel);
+    // Process cascades one at a time with animation
+    while (true) {
+      // Detect lines to clear
+      const lines = this.cascadeEngine.detectLines(this.board);
+
+      if (!lines) {
+        // No more lines to clear
+        break;
+      }
+
+      // Schedule the clear animation
+      this.clearAnimationManager.scheduleClearing(lines.rows, lines.cols, this.board);
+
+      // Wait for animation to complete
+      const animDuration = this.clearAnimationManager.getTotalDuration();
+      await this.delay(animDuration);
+
+      // Actually clear the lines from the board
+      const linesCleared = this.cascadeEngine.clearLines(this.board, lines);
+      totalLinesCleared += linesCleared;
+
+      // Clear animation state
+      this.clearAnimationManager.clear();
+
+      // Small delay between cascade levels
+      await this.delay(100);
+    }
+
+    // Calculate score
+    if (totalLinesCleared > 0) {
+      const cascadeLevel = this.cascadeEngine.getCascadeLevel();
+      const score = this.scoreManager.addScore(totalLinesCleared, cascadeLevel);
 
       // Show cascade message
-      if (result.cascadeLevel > 1) {
-        this.hudRenderer.showMessage(`${result.cascadeLevel}x CASCADE! +${score}`);
+      if (cascadeLevel > 1) {
+        this.hudRenderer.showMessage(`${cascadeLevel}x CASCADE! +${score}`);
       }
     } else {
       // Reset combo if no lines cleared

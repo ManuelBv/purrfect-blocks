@@ -76,6 +76,63 @@ export class BoardRenderer {
     this.ctx.fillRect(x + 1, y + 1, this.cellSize - 2, this.cellSize - 2);
   }
 
+  /**
+   * Draw a cell with break animation progress (0 = full, 1 = gone)
+   */
+  drawCellWithAnimation(row: number, col: number, color: string, progress: number): void {
+    const x = col * this.cellSize;
+    const y = row * this.cellSize;
+    const size = this.cellSize - 2;
+
+    this.ctx.save();
+
+    // Break into 4 quadrants that separate
+    const offset = progress * (this.cellSize * 0.3); // Spread out as they disappear
+    const fadeAlpha = 1 - progress; // Fade out
+    const scale = 1 - progress * 0.5; // Shrink
+
+    this.ctx.globalAlpha = fadeAlpha;
+
+    const quadSize = size / 2;
+    const centerX = x + this.cellSize / 2;
+    const centerY = y + this.cellSize / 2;
+
+    // Top-left quadrant
+    this.ctx.fillStyle = color;
+    this.ctx.fillRect(
+      centerX - quadSize - offset * scale,
+      centerY - quadSize - offset * scale,
+      quadSize * scale,
+      quadSize * scale
+    );
+
+    // Top-right quadrant
+    this.ctx.fillRect(
+      centerX + offset * scale,
+      centerY - quadSize - offset * scale,
+      quadSize * scale,
+      quadSize * scale
+    );
+
+    // Bottom-left quadrant
+    this.ctx.fillRect(
+      centerX - quadSize - offset * scale,
+      centerY + offset * scale,
+      quadSize * scale,
+      quadSize * scale
+    );
+
+    // Bottom-right quadrant
+    this.ctx.fillRect(
+      centerX + offset * scale,
+      centerY + offset * scale,
+      quadSize * scale,
+      quadSize * scale
+    );
+
+    this.ctx.restore();
+  }
+
   getCellSize(): number {
     return this.cellSize;
   }
