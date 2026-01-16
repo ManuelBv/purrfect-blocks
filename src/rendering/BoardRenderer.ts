@@ -86,10 +86,13 @@ export class BoardRenderer {
 
     this.ctx.save();
 
-    // Break into 4 quadrants that separate
-    const offset = progress * (this.cellSize * 0.3); // Spread out as they disappear
-    const fadeAlpha = 1 - progress; // Fade out
-    const scale = 1 - progress * 0.5; // Shrink
+    // More dramatic break animation
+    const offset = progress * (this.cellSize * 0.6); // Spread further (was 0.3)
+    const fadeAlpha = Math.max(0, 1 - progress * 1.2); // Fade out faster
+    const scale = Math.max(0, 1 - progress * 0.8); // Shrink more (was 0.5)
+
+    // Add rotation for more dynamic effect
+    const rotation = progress * Math.PI * 0.5; // Rotate as they break
 
     this.ctx.globalAlpha = fadeAlpha;
 
@@ -97,38 +100,38 @@ export class BoardRenderer {
     const centerX = x + this.cellSize / 2;
     const centerY = y + this.cellSize / 2;
 
-    // Top-left quadrant
-    this.ctx.fillStyle = color;
-    this.ctx.fillRect(
-      centerX - quadSize - offset * scale,
-      centerY - quadSize - offset * scale,
-      quadSize * scale,
-      quadSize * scale
-    );
+    // Draw each quadrant with rotation
+    const quadrants = [
+      { offsetX: -1, offsetY: -1 }, // Top-left
+      { offsetX: 1, offsetY: -1 },  // Top-right
+      { offsetX: -1, offsetY: 1 },  // Bottom-left
+      { offsetX: 1, offsetY: 1 },   // Bottom-right
+    ];
 
-    // Top-right quadrant
-    this.ctx.fillRect(
-      centerX + offset * scale,
-      centerY - quadSize - offset * scale,
-      quadSize * scale,
-      quadSize * scale
-    );
+    quadrants.forEach(({ offsetX, offsetY }) => {
+      this.ctx.save();
 
-    // Bottom-left quadrant
-    this.ctx.fillRect(
-      centerX - quadSize - offset * scale,
-      centerY + offset * scale,
-      quadSize * scale,
-      quadSize * scale
-    );
+      // Position of this quadrant
+      const qx = centerX + offsetX * offset;
+      const qy = centerY + offsetY * offset;
 
-    // Bottom-right quadrant
-    this.ctx.fillRect(
-      centerX + offset * scale,
-      centerY + offset * scale,
-      quadSize * scale,
-      quadSize * scale
-    );
+      // Translate to quadrant position
+      this.ctx.translate(qx, qy);
+
+      // Rotate around quadrant center
+      this.ctx.rotate(rotation * offsetX * offsetY);
+
+      // Draw the quadrant centered
+      this.ctx.fillStyle = color;
+      this.ctx.fillRect(
+        -quadSize * scale / 2,
+        -quadSize * scale / 2,
+        quadSize * scale,
+        quadSize * scale
+      );
+
+      this.ctx.restore();
+    });
 
     this.ctx.restore();
   }

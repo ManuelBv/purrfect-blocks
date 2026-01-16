@@ -10,8 +10,8 @@ export interface BlockClearAnimation {
 
 export class ClearAnimationManager {
   private animations: BlockClearAnimation[] = [];
-  private animationDuration = 150; // ms per block
-  private staggerDelay = 50; // ms delay between blocks in a line
+  private animationDuration = 400; // ms per block (increased from 150 for visibility)
+  private staggerDelay = 120; // ms delay between blocks in a line (increased from 50)
 
   /**
    * Schedule clearing animations for rows and columns
