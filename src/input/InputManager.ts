@@ -88,16 +88,60 @@ export class InputManager {
 
   private handleTouchStart(event: TouchEvent): void {
     event.preventDefault();
-    // Touch support for Phase 4
+
+    if (event.touches.length === 0) return;
+
+    const touch = event.touches[0];
+    const rect = this.boardCanvas.getBoundingClientRect();
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+
+    // Trigger haptic feedback if available
+    this.triggerHaptic('light');
+
+    // Store touch coordinates (will be handled by drag from panel)
+    this.dragHandler['dragState'].currentX = x;
+    this.dragHandler['dragState'].currentY = y;
   }
 
   private handleTouchMove(event: TouchEvent): void {
     event.preventDefault();
-    // Touch support for Phase 4
+
+    if (!this.dragHandler.isDragging() || event.touches.length === 0) return;
+
+    const touch = event.touches[0];
+    const rect = this.boardCanvas.getBoundingClientRect();
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+
+    // Update drag coordinates
+    this.dragHandler['dragState'].currentX = x;
+    this.dragHandler['dragState'].currentY = y;
   }
 
   private handleTouchEnd(event: TouchEvent): void {
-    // Touch support for Phase 4
+    if (!this.dragHandler.isDragging()) return;
+
+    // Trigger haptic feedback if available
+    this.triggerHaptic('medium');
+
+    const result = this.dragHandler.endDrag();
+
+    if (result && this.onPiecePlaced) {
+      this.onPiecePlaced(result.piece, result.row, result.col);
+    }
+  }
+
+  private triggerHaptic(intensity: 'light' | 'medium' | 'heavy'): void {
+    // Trigger haptic feedback on supported devices
+    if ('vibrate' in navigator) {
+      const patterns = {
+        light: 10,
+        medium: 20,
+        heavy: 30
+      };
+      navigator.vibrate(patterns[intensity]);
+    }
   }
 
   getDragHandler(): DragHandler {

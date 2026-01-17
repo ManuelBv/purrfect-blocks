@@ -17,6 +17,9 @@ import { GameState } from '../types/GameTypes';
 import type { VisualEffect } from '../types/RenderTypes';
 import type { Piece } from '../pieces/Piece';
 import { clearBoardCanvas } from '../utils/CanvasUtils';
+import { GameStorage } from '../storage/GameStorage';
+import { AudioEngine } from '../audio/AudioEngine';
+import { SoundEffects } from '../audio/SoundEffects';
 
 export class Game {
   private board: GameBoard;
@@ -35,6 +38,12 @@ export class Game {
   private effects: VisualEffect[] = [];
   private animatingCascade: boolean = false;
   private clearAnimationManager: ClearAnimationManager;
+
+  private gameStorage: GameStorage;
+  private autoSaveTimeout: number | null = null;
+
+  private audioEngine: AudioEngine;
+  private soundEffects: SoundEffects;
 
   constructor(
     boardCanvas: HTMLCanvasElement,
@@ -66,10 +75,26 @@ export class Game {
       this.handlePieceSelected.bind(this)
     );
 
-    // Setup panel click handler
+    // Setup panel click and touch handlers
     panelCanvas.addEventListener('mousedown', this.handlePanelClick.bind(this));
+    panelCanvas.addEventListener('touchstart', this.handlePanelTouch.bind(this), { passive: false });
 
     this.animationLoop = new AnimationLoop(this.update.bind(this));
+
+    this.gameStorage = new GameStorage();
+
+    // Initialize audio
+    this.audioEngine = new AudioEngine();
+    this.audioEngine.init();
+    this.soundEffects = new SoundEffects(this.audioEngine);
+
+    // Resume audio on first user interaction
+    document.addEventListener('click', () => {
+      this.audioEngine.resume();
+    }, { once: true });
+
+    // Setup audio test buttons
+    this.setupAudioTestButtons();
 
     this.init();
   }
@@ -88,10 +113,76 @@ export class Game {
     canvas.style.height = `${rect.height}px`;
   }
 
-  private init(): void {
+  private async init(): Promise<void> {
+    console.log('Game init starting...');
+
+    let storageAvailable = false;
+
+    // Initialize storage with auto-recovery for corruption
+    try {
+      console.log('Initializing storage...');
+      await this.gameStorage.init();
+      console.log('Storage initialized successfully');
+      storageAvailable = true;
+    } catch (error) {
+      console.warn('Database initialization failed, skipping storage:', error);
+      // Continue without storage - game will work fine
+    }
+
+    // Load and display high score
+    const storedHighScore = localStorage.getItem('purrfectBlocksHighScore');
+    const highScore = storedHighScore ? parseInt(storedHighScore) : 0;
+    this.hudRenderer.updateHighScore(highScore);
+    console.log('High score loaded:', highScore);
+
+    // Try to load saved game only if storage is available
+    if (storageAvailable) {
+      try {
+        console.log('Attempting to load saved game...');
+        const savedGame = await this.gameStorage.loadGame();
+
+        if (savedGame) {
+          console.log('Restoring saved game from', new Date(savedGame.timestamp).toLocaleString());
+          this.restoreGameState(savedGame);
+        } else {
+          console.log('No saved game found, starting fresh');
+        }
+      } catch (error) {
+        console.warn('Failed to load saved game, starting fresh:', error);
+      }
+    } else {
+      console.log('Storage not available, starting fresh game');
+    }
+
     this.gameState = GameState.PLAYING;
+
+    // Debug: Check if pieces exist
+    const pieces = this.pieceManager.getAvailablePieces();
+    console.log('Available pieces after init:', pieces.length, pieces);
+
     this.animationLoop.start();
     this.render();
+    console.log('Game init complete!');
+  }
+
+  private setupAudioTestButtons(): void {
+    const buttons = [
+      { id: 'test-piece-placed', handler: () => this.soundEffects.playPiecePlaced() },
+      { id: 'test-line-clear', handler: () => this.soundEffects.playLineClear() },
+      { id: 'test-cascade-2x', handler: () => this.soundEffects.playCascade(2) },
+      { id: 'test-cascade-3x', handler: () => this.soundEffects.playCascade(3) },
+      { id: 'test-cascade-4x', handler: () => this.soundEffects.playCascade(4) },
+      { id: 'test-game-over', handler: () => this.soundEffects.playGameOver() },
+      { id: 'test-success', handler: () => this.soundEffects.playSuccess() },
+      { id: 'test-invalid', handler: () => this.soundEffects.playInvalid() },
+    ];
+
+    buttons.forEach(({ id, handler }) => {
+      const button = document.getElementById(id);
+      if (button) {
+        button.addEventListener('click', handler);
+      }
+    });
   }
 
   private update(deltaTime: number): void {
@@ -237,12 +328,44 @@ export class Game {
     }
   }
 
+  private handlePanelTouch(event: TouchEvent): void {
+    if (this.gameState !== GameState.PLAYING) return;
+    event.preventDefault();
+
+    if (event.touches.length === 0) return;
+
+    const touch = event.touches[0];
+    const canvas = event.currentTarget as HTMLCanvasElement;
+    const rect = canvas.getBoundingClientRect();
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+
+    const slotIndex = this.panelRenderer.getSlotIndexFromCoordinates(x, y);
+
+    if (slotIndex >= 0) {
+      const piece = this.pieceManager.selectPiece(slotIndex);
+      if (piece) {
+        // Create a MouseEvent-like object for compatibility with startDragFromPanel
+        const mouseEvent = {
+          clientX: touch.clientX,
+          clientY: touch.clientY
+        } as MouseEvent;
+
+        // Start dragging this piece
+        this.inputManager.startDragFromPanel(piece, mouseEvent);
+      }
+    }
+  }
+
   private handlePieceSelected(index: number): void {
     this.pieceManager.selectPiece(index);
   }
 
   private handlePiecePlaced(piece: Piece, row: number, col: number): void {
     if (this.animatingCascade) return;
+
+    // Play piece placement sound
+    this.soundEffects.playPiecePlaced();
 
     // Place piece on board
     this.board.placePiece(piece.shape, row, col, piece.color, piece.id);
@@ -278,6 +401,9 @@ export class Game {
 
       console.log('Starting clear animation for', lines.rows.length, 'rows and', lines.cols.length, 'cols');
 
+      // Play line clear sound at the start of the animation
+      this.soundEffects.playLineClear();
+
       // Schedule the clear animation
       this.clearAnimationManager.scheduleClearing(lines.rows, lines.cols, this.board);
 
@@ -308,8 +434,9 @@ export class Game {
       const cascadeLevel = this.cascadeEngine.getCascadeLevel();
       const score = this.scoreManager.addScore(totalLinesCleared, cascadeLevel);
 
-      // Show cascade message
+      // Play cascade sound if cascade level > 1
       if (cascadeLevel > 1) {
+        this.soundEffects.playCascade(cascadeLevel);
         this.hudRenderer.showMessage(`${cascadeLevel}x CASCADE! +${score}`);
       }
     } else {
@@ -318,6 +445,9 @@ export class Game {
     }
 
     this.animatingCascade = false;
+
+    // Auto-save the game state
+    this.scheduleAutoSave();
 
     // Check game over after cascades complete and new pieces are available
     if (!this.pieceManager.hasPlayablePieces(this.board)) {
@@ -342,6 +472,9 @@ export class Game {
     this.gameState = GameState.GAME_OVER;
     this.animationLoop.stop();
 
+    // Play game over sound
+    this.soundEffects.playGameOver();
+
     const finalScore = this.scoreManager.getScore();
 
     // Get/update high score from localStorage
@@ -351,6 +484,8 @@ export class Game {
 
     if (newHighScore > highScore) {
       localStorage.setItem('purrfectBlocksHighScore', newHighScore.toString());
+      // Update displayed high score
+      this.hudRenderer.updateHighScore(newHighScore);
     }
 
     // Wait 200ms before showing modal
@@ -383,6 +518,77 @@ export class Game {
     }
   }
 
+  /**
+   * Schedule an auto-save with 300ms debounce
+   */
+  private scheduleAutoSave(): void {
+    // Clear any existing timeout
+    if (this.autoSaveTimeout !== null) {
+      clearTimeout(this.autoSaveTimeout);
+    }
+
+    // Schedule new save
+    this.autoSaveTimeout = window.setTimeout(() => {
+      this.saveGame();
+      this.autoSaveTimeout = null;
+    }, 300);
+  }
+
+  /**
+   * Save current game state to IndexedDB
+   */
+  private async saveGame(): Promise<void> {
+    try {
+      const state = {
+        board: this.board.getCells().map(row =>
+          row.map(cell => cell.occupied ? 1 : 0)
+        ),
+        score: this.scoreManager.getScore(),
+        combo: this.scoreManager.getComboMultiplier(),
+        availablePieces: this.pieceManager.getAvailablePieces().map(piece => ({
+          shape: piece.shape,
+          color: piece.color,
+          id: piece.id
+        })),
+        timestamp: Date.now()
+      };
+
+      await this.gameStorage.saveGame(state);
+      console.log('Game auto-saved');
+    } catch (error) {
+      console.error('Failed to auto-save game:', error);
+    }
+  }
+
+  /**
+   * Restore game state from saved data
+   */
+  private restoreGameState(savedGame: any): void {
+    try {
+      // Restore board
+      const cells = savedGame.board;
+      const boardCells = this.board.getCells();
+
+      for (let r = 0; r < cells.length && r < boardCells.length; r++) {
+        for (let c = 0; c < cells[r].length && c < boardCells[r].length; c++) {
+          if (cells[r][c] === 1) {
+            // Use the board's setter method instead of direct assignment
+            this.board.placePiece([[true]], r, c, '#D84315', `restored-${r}-${c}`);
+          }
+        }
+      }
+
+      // Restore score
+      this.scoreManager['score'] = savedGame.score;
+      this.scoreManager['comboMultiplier'] = savedGame.combo;
+
+      console.log('Game state restored: score =', savedGame.score, 'combo =', savedGame.combo);
+    } catch (error) {
+      console.error('Failed to restore game state:', error);
+      // If restoration fails, just start fresh
+    }
+  }
+
   restart(): void {
     this.board.clear();
     this.scoreManager.reset();
@@ -391,7 +597,35 @@ export class Game {
     this.effects = [];
     this.animatingCascade = false;
     this.gameState = GameState.PLAYING;
+
+    // Delete saved game when restarting
+    this.gameStorage.deleteSave().catch(err =>
+      console.error('Failed to delete save:', err)
+    );
+
     this.animationLoop.start();
     this.render();
+  }
+
+  getAudioEngine(): AudioEngine {
+    return this.audioEngine;
+  }
+
+  pause(): void {
+    if (this.gameState === GameState.PLAYING) {
+      this.gameState = GameState.PAUSED;
+      this.animationLoop.stop();
+    }
+  }
+
+  resume(): void {
+    if (this.gameState === GameState.PAUSED) {
+      this.gameState = GameState.PLAYING;
+      this.animationLoop.start();
+    }
+  }
+
+  isPaused(): boolean {
+    return this.gameState === GameState.PAUSED;
   }
 }

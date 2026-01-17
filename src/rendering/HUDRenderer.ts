@@ -22,6 +22,13 @@ export class HUDRenderer {
     }
   }
 
+  updateHighScore(highScore: number): void {
+    const highScoreEl = document.getElementById('high-score-display');
+    if (highScoreEl) {
+      highScoreEl.textContent = highScore.toString();
+    }
+  }
+
   showMessage(message: string, duration: number = 2000): void {
     // Create temporary message element
     const msgEl = document.createElement('div');
