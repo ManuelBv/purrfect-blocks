@@ -1,7 +1,7 @@
 // Draws the 12×18 grid and placed pieces
 
 import type { Cell } from '../board/Cell';
-import { calculateBoardDimensions } from '../utils/Constants';
+import { calculateBoardDimensions } from '../utils/constants';
 import { UI_COLORS } from '../utils/Colors';
 import { clearBoardCanvas } from '../utils/CanvasUtils';
 

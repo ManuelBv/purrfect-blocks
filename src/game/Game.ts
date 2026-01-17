@@ -8,7 +8,7 @@ import { Piece } from '../pieces/Piece';
 import { BoardRenderer } from '../rendering/BoardRenderer';
 import { AnimationLoop } from '../rendering/AnimationLoop';
 import { GameState } from '../types/GameTypes';
-import { PIECE_CONFIG } from '../utils/Constants';
+import { PIECE_CONFIG } from '../utils/constants';
 
 export class Game {
   private board: GameBoard;

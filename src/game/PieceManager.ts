@@ -2,7 +2,7 @@
 
 import { PieceFactory } from '../pieces/PieceFactory';
 import { Piece } from '../pieces/Piece';
-import { PIECE_CONFIG } from '../utils/Constants';
+import { PIECE_CONFIG } from '../utils/constants';
 import type { GameBoard } from './GameBoard';
 
 export class PieceManager {
