@@ -371,7 +371,7 @@ export class Game {
     if (event.touches.length === 0) return;
 
     const touch = event.touches[0];
-    const boardCanvas = this.boardRenderer['canvas'];
+    const boardCanvas = this.boardRenderer.getCanvas();
     const rect = boardCanvas.getBoundingClientRect();
     const x = touch.clientX - rect.left;
     const y = touch.clientY - rect.top;

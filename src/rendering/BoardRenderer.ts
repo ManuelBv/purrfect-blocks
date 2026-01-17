@@ -6,10 +6,12 @@ import { UI_COLORS } from '../utils/Colors';
 import { clearBoardCanvas } from '../utils/CanvasUtils';
 
 export class BoardRenderer {
+  private canvas: HTMLCanvasElement;
   private ctx: CanvasRenderingContext2D;
   private cellSize: number;
 
   constructor(canvas: HTMLCanvasElement) {
+    this.canvas = canvas;
     const context = canvas.getContext('2d');
     if (!context) {
       throw new Error('Could not get 2d context');
@@ -139,5 +141,9 @@ export class BoardRenderer {
 
   getCellSize(): number {
     return this.cellSize;
+  }
+
+  getCanvas(): HTMLCanvasElement {
+    return this.canvas;
   }
 }
