@@ -13,6 +13,7 @@ export interface DragState {
   isValid: boolean;
   gridRow: number;
   gridCol: number;
+  isTouch: boolean; // Whether this drag was initiated by touch
 }
 
 export class DragHandler {
@@ -26,9 +27,10 @@ export class DragHandler {
     isValid: false,
     gridRow: 0,
     gridCol: 0,
+    isTouch: false,
   };
 
-  startDrag(piece: Piece, mouseX: number, mouseY: number): void {
+  startDrag(piece: Piece, mouseX: number, mouseY: number, isTouch: boolean = false): void {
     this.dragState = {
       piece,
       startX: mouseX,
@@ -39,6 +41,7 @@ export class DragHandler {
       isValid: false,
       gridRow: 0,
       gridCol: 0,
+      isTouch,
     };
   }
 
@@ -88,6 +91,7 @@ export class DragHandler {
       isValid: false,
       gridRow: 0,
       gridCol: 0,
+      isTouch: false,
     };
   }
 

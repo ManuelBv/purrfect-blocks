@@ -48,12 +48,12 @@ export class InputManager {
     this.boardCanvas.addEventListener('touchend', this.handleTouchEnd.bind(this));
   }
 
-  startDragFromPanel(piece: Piece, event: MouseEvent): void {
+  startDragFromPanel(piece: Piece, event: MouseEvent, isTouch: boolean = false): void {
     const rect = this.boardCanvas.getBoundingClientRect();
     const x = event.clientX - rect.left;
     const y = event.clientY - rect.top;
 
-    this.dragHandler.startDrag(piece, x, y);
+    this.dragHandler.startDrag(piece, x, y, isTouch);
   }
 
   updateDrag(board: GameBoard): void {

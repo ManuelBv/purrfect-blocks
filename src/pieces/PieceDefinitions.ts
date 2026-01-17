@@ -125,8 +125,8 @@ rotations.forEach((rotation, idx) => {
   });
 });
 
-// Square pieces (1x1 through 6x6)
-for (let size = 1; size <= 6; size++) {
+// Square pieces (1x1 through 4x4) - limited to 4x4 for mobile compatibility
+for (let size = 1; size <= 4; size++) {
   PIECE_DEFINITIONS.push({
     type: 'SQUARE' as PieceType,
     shape: createSquare(size),
@@ -136,5 +136,5 @@ for (let size = 1; size <= 6; size++) {
   });
 }
 
-// Total: 16 tetromino rotations + 6 squares = 22 pieces
-console.assert(PIECE_DEFINITIONS.length === 22, 'Should have exactly 22 piece definitions');
+// Total: 16 tetromino rotations + 4 squares = 20 pieces
+console.assert(PIECE_DEFINITIONS.length === 20, 'Should have exactly 20 piece definitions');

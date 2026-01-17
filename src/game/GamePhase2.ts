@@ -302,11 +302,16 @@ export class Game {
 
         // Draw piece following cursor (in game-area space)
         // dragState coordinates are relative to board canvas, so add board offset
+        // For touch: apply -50% offset so finger doesn't cover the piece
+        const dims = PieceRenderer.getPieceDimensions(dragState.piece.shape, cellSize);
+        const touchOffsetX = dragState.isTouch ? -dims.width * 0.5 : 0;
+        const touchOffsetY = dragState.isTouch ? -dims.height * 0.5 : 0;
+
         PieceRenderer.renderPiece(
           effectsCtx,
           dragState.piece,
-          dragState.currentX + boardOffsetX - cellSize,
-          dragState.currentY + boardOffsetY - cellSize,
+          dragState.currentX + boardOffsetX - cellSize + touchOffsetX,
+          dragState.currentY + boardOffsetY - cellSize + touchOffsetY,
           cellSize,
           0.8
         );
@@ -356,8 +361,8 @@ export class Game {
           clientY: touch.clientY
         } as MouseEvent;
 
-        // Start dragging this piece
-        this.inputManager.startDragFromPanel(piece, mouseEvent);
+        // Start dragging this piece (mark as touch for offset)
+        this.inputManager.startDragFromPanel(piece, mouseEvent, true);
       }
     }
   }
