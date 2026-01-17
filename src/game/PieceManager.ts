@@ -28,15 +28,16 @@ export class PieceManager {
     return this.availablePieces[index];
   }
 
-  consumePiece(index: number): Piece | null {
+  consumePiece(index: number, comboMultiplier: number = 1.0): Piece | null {
     if (index < 0 || index >= this.availablePieces.length) {
       return null;
     }
 
     const piece = this.availablePieces[index];
 
-    // Replace consumed piece with new one
-    this.availablePieces[index] = this.factory.createRandomPiece();
+    // Replace consumed piece with new one (with potential bomb if combo >= 1.5x)
+    const newPieces = this.factory.createMultiplePieces(1, comboMultiplier);
+    this.availablePieces[index] = newPieces[0];
     this.selectedIndex = -1;
 
     return piece;

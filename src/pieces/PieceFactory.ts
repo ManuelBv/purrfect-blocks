@@ -1,6 +1,7 @@
 // Factory for creating pieces
 
 import { Piece } from './Piece';
+import { BombPiece } from './BombPiece';
 import { PIECE_DEFINITIONS } from './PieceDefinitions';
 
 export class PieceFactory {
@@ -16,11 +17,28 @@ export class PieceFactory {
     return new Piece(PIECE_DEFINITIONS[index]);
   }
 
-  createMultiplePieces(count: number): Piece[] {
+  createBombPiece(): BombPiece {
+    return new BombPiece();
+  }
+
+  /**
+   * Create pieces with optional bomb replacement based on combo multiplier
+   * @param count Number of pieces to create
+   * @param comboMultiplier Current combo multiplier (1.0 = no combo, 1.5 = 1.5x, etc.)
+   * @returns Array of pieces with potential bomb replacement
+   */
+  createMultiplePieces(count: number, comboMultiplier: number = 1.0): Piece[] {
     const pieces: Piece[] = [];
     for (let i = 0; i < count; i++) {
       pieces.push(this.createRandomPiece());
     }
+
+    // Replace one random piece with bomb if combo >= 1.5x
+    if (comboMultiplier >= 1.5 && pieces.length > 0) {
+      const replaceIndex = Math.floor(Math.random() * pieces.length);
+      pieces[replaceIndex] = this.createBombPiece();
+    }
+
     return pieces;
   }
 }

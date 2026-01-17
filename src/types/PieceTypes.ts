@@ -8,6 +8,7 @@ export enum PieceType {
   TETROMINO_F = 'TETROMINO_F',
   TETROMINO_T = 'TETROMINO_T',
   SQUARE = 'SQUARE',
+  BOMB = 'BOMB',
 }
 
 export interface PieceDefinition {
