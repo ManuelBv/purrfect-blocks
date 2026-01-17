@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Purrfect Blocks - Cozy Block Puzzle Game</title>
+  <meta name="description" content="A cozy block puzzle game with cats and coffee vibes">
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23D4A574' rx='20'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' font-family='Arial, sans-serif'%3E🐱%3C/text%3E%3C/svg%3E">
+  <script type="module" crossorigin src="/purrfect-blocks/assets/index.CwEvwooI.js"></script>
+  <link rel="stylesheet" crossorigin href="/purrfect-blocks/assets/index.C_7PltQ_.css">
+</head>
+<body>
+  <button id="settings-btn-top" class="settings-btn-top">⚙️ Settings</button>
+
+  <div id="app">
+    <h1>Purrfect Blocks 🐱☕</h1>
+    <div id="player-greeting" class="player-greeting"></div>
+
+    <div class="hud">
+      <div class="hud-item">
+        <span class="hud-label">Score:</span>
+        <span class="hud-value" id="score">0</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">Combo:</span>
+        <span class="hud-value combo-value" id="combo">1.0x</span>
+      </div>
+      <div class="hud-item">
+        <span class="hud-label">High Score:</span>
+        <span class="hud-value" id="high-score-display">0</span>
+      </div>
+    </div>
+
+    <div class="game-area">
+      <canvas id="effects-canvas" class="effects-overlay"></canvas>
+
+      <canvas id="board-canvas" class="game-canvas"></canvas>
+
+      <canvas id="panel-canvas"></canvas>
+    </div>
+
+    <div class="game-controls">
+      <button id="restart-btn">Restart Game</button>
+      <button id="fullscreen-btn">Fullscreen</button>
+      <button id="exit-fullscreen-btn" style="display: none;">Exit Fullscreen</button>
+    </div>
+
+    <div class="instructions">
+      <p>🎮 Click a piece, then drag it to the board!</p>
+      <p class="phase-info">Phase 2: Drag & Drop</p>
+    </div>
+
+    <!-- Audio Test Buttons -->
+    <div class="audio-test-panel">
+      <h3>Audio Test</h3>
+      <div class="audio-test-buttons">
+        <button id="test-piece-placed">Piece Placed</button>
+        <button id="test-line-clear">Line Clear</button>
+        <button id="test-cascade-2x">Cascade 2x</button>
+        <button id="test-cascade-3x">Cascade 3x</button>
+        <button id="test-cascade-4x">Cascade 4x</button>
+        <button id="test-game-over">Game Over</button>
+        <button id="test-success">Success</button>
+        <button id="test-invalid">Invalid</button>
+      </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="game-over-modal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close" id="modal-close-btn">×</button>
+        <h2>Game Over!</h2>
+        <div class="modal-stats">
+          <p class="stat-line">Score: <span id="final-score">0</span></p>
+          <p class="stat-line">High Score: <span id="high-score">0</span></p>
+        </div>
+        <button id="play-again-btn">Play Again</button>
+      </div>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close" id="settings-close-btn">×</button>
+        <h2>Settings</h2>
+        <div class="settings-options">
+          <div class="setting-item">
+            <label for="player-name-input">Player Name</label>
+            <input type="text" id="player-name-input" maxlength="20" placeholder="Enter your name">
+          </div>
+          <div class="setting-item volume-control">
+            <label for="volume-slider">Sound</label>
+            <div class="volume-row">
+              <input type="range" id="volume-slider" min="0" max="100" value="70">
+              <span id="volume-value">70%</span>
+              <button id="mute-toggle" class="mute-btn">🔊</button>
+            </div>
+          </div>
+        </div>
+        <button id="save-settings-btn" class="save-settings-btn">Save Settings</button>
+
+        <details class="extra-details">
+          <summary>Extra details</summary>
+          <div class="setting-item uuid-section">
+            <label>Your Unique ID</label>
+            <div class="uuid-subtitle">Cannot be edited</div>
+            <div class="uuid-value" id="player-uuid">-</div>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
