@@ -49,21 +49,10 @@ h1 {
   gap: 15px;
 }
 
-.game-container {
-  background: var(--color-cream);
-  padding: 20px;
-  border-radius: 15px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-}
-
-.game-canvas {
-  display: block;
-  border: 3px solid var(--color-espresso);
-}
-
 #board-canvas {
+  display: block;
+  border: 1px solid var(--color-espresso);
   cursor: crosshair;
-  border-radius: 0;
 }
 
 .effects-overlay {
@@ -76,27 +65,9 @@ h1 {
 }
 
 /* Piece panel */
-.panel-container {
-  background: rgba(255, 255, 255, 0.9);
-  padding: 15px;
-  border-radius: 10px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-}
-
-.panel-label {
-  text-align: center;
-  color: var(--color-mocha);
-  font-size: 0.9rem;
-  font-weight: bold;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  margin-bottom: 10px;
-}
-
 #panel-canvas {
   display: block;
   cursor: pointer;
-  border-radius: 8px;
 }
 
 /* Instructions */
@@ -172,30 +143,19 @@ h1 {
   gap: 30px;
   justify-content: center;
   align-items: center;
-  padding: 15px;
-  background: rgba(255, 255, 255, 0.9);
-  border-radius: 10px;
   font-size: 1.2rem;
   font-weight: bold;
 }
 
 .hud-item {
   display: flex;
-  flex-direction: column;
   align-items: center;
-  gap: 5px;
-}
-
-.hud-label {
-  font-size: 0.9rem;
-  color: var(--color-mocha);
-  text-transform: uppercase;
-  letter-spacing: 1px;
 }
 
 .hud-value {
   font-size: 1.5rem;
-  color: var(--color-espresso);
+  color: var(--color-cream);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
 }
 
 button {
@@ -203,21 +163,93 @@ button {
   font-size: 1rem;
   font-weight: bold;
   color: var(--color-cream);
-  background: linear-gradient(135deg, var(--color-burnt-orange) 0%, var(--color-mocha) 100%);
+  background: var(--color-burnt-orange);
   border: none;
   border-radius: 8px;
   cursor: pointer;
-  transition: transform 0.2s, box-shadow 0.2s;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s;
 }
 
 button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+  background: #E64A19;
 }
 
 button:active {
   transform: translateY(0);
+}
+
+/* Game Over Modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: var(--color-cream);
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  text-align: center;
+  position: relative;
+  min-width: 300px;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: var(--color-espresso);
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  line-height: 1;
+  transition: transform 0.2s;
+}
+
+.modal-close:hover {
+  transform: scale(1.2);
+}
+
+.modal-content h2 {
+  color: var(--color-espresso);
+  margin-bottom: 20px;
+  font-size: 2rem;
+}
+
+.modal-stats {
+  margin: 20px 0;
+}
+
+.stat-line {
+  font-size: 1.2rem;
+  color: var(--color-mocha);
+  margin: 10px 0;
+}
+
+.stat-line span {
+  font-weight: bold;
+  color: var(--color-burnt-orange);
+}
+
+#play-again-btn {
+  margin-top: 20px;
 }
 
 /* Mobile responsiveness */
@@ -233,5 +265,10 @@ button:active {
 
   .hud-value {
     font-size: 1.2rem;
+  }
+
+  .modal-content {
+    padding: 30px 20px;
+    min-width: 250px;
   }
 }

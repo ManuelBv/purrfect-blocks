@@ -12,11 +12,9 @@
 
     <div class="hud">
       <div class="hud-item">
-        <span class="hud-label">Score</span>
         <span class="hud-value" id="score">0</span>
       </div>
       <div class="hud-item">
-        <span class="hud-label">Combo</span>
         <span class="hud-value combo-value" id="combo">1.0x</span>
       </div>
     </div>
@@ -24,14 +22,9 @@
     <div class="game-area">
       <canvas id="effects-canvas" class="effects-overlay"></canvas>
 
-      <div class="game-container">
-        <canvas id="board-canvas" class="game-canvas"></canvas>
-      </div>
+      <canvas id="board-canvas" class="game-canvas"></canvas>
 
-      <div class="panel-container">
-        <p class="panel-label">Select a piece:</p>
-        <canvas id="panel-canvas"></canvas>
-      </div>
+      <canvas id="panel-canvas"></canvas>
     </div>
 
     <button id="restart-btn">Restart Game</button>
@@ -39,6 +32,19 @@
     <div class="instructions">
       <p>🎮 Click a piece, then drag it to the board!</p>
       <p class="phase-info">Phase 2: Drag & Drop</p>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div id="game-over-modal" class="modal hidden">
+      <div class="modal-content">
+        <button class="modal-close" id="modal-close-btn">×</button>
+        <h2>Game Over!</h2>
+        <div class="modal-stats">
+          <p class="stat-line">Score: <span id="final-score">0</span></p>
+          <p class="stat-line">High Score: <span id="high-score">0</span></p>
+        </div>
+        <button id="play-again-btn">Play Again</button>
+      </div>
     </div>
   </div>
 

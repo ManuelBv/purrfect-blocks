@@ -3,6 +3,7 @@
 import type { Cell } from '../board/Cell';
 import { calculateBoardDimensions } from '../utils/Constants';
 import { UI_COLORS } from '../utils/Colors';
+import { clearBoardCanvas } from '../utils/CanvasUtils';
 
 export class BoardRenderer {
   private ctx: CanvasRenderingContext2D;
@@ -28,12 +29,12 @@ export class BoardRenderer {
   }
 
   private clear(): void {
-    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height);
+    clearBoardCanvas(this.ctx);
   }
 
   private drawGrid(): void {
-    this.ctx.strokeStyle = UI_COLORS.GRID_LINE;
-    this.ctx.lineWidth = 1;
+    this.ctx.strokeStyle = 'rgba(141, 110, 99, 0.3)';
+    this.ctx.lineWidth = 0.5;
 
     const rows = 18;
     const cols = 12;

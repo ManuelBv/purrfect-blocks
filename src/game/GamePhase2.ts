@@ -16,6 +16,7 @@ import { ClearAnimationManager } from '../rendering/ClearAnimationManager';
 import { GameState } from '../types/GameTypes';
 import type { VisualEffect } from '../types/RenderTypes';
 import type { Piece } from '../pieces/Piece';
+import { clearBoardCanvas } from '../utils/CanvasUtils';
 
 export class Game {
   private board: GameBoard;
@@ -142,7 +143,7 @@ export class Game {
     const cellSize = this.boardRenderer.getCellSize();
 
     // Clear and draw grid
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+    clearBoardCanvas(ctx);
     this.boardRenderer['drawGrid']();
 
     // Draw all cells
@@ -254,11 +255,6 @@ export class Game {
 
     // Process cascades with animation
     this.processCascadeWithAnimation();
-
-    // Check game over
-    if (this.board.isFull()) {
-      this.gameOver();
-    }
   }
 
   private async processCascadeWithAnimation(): Promise<void> {
@@ -322,6 +318,12 @@ export class Game {
     }
 
     this.animatingCascade = false;
+
+    // Check game over after cascades complete and new pieces are available
+    if (!this.pieceManager.hasPlayablePieces(this.board)) {
+      console.log('Game Over: No playable pieces');
+      this.gameOver();
+    }
   }
 
   private updateEffects(deltaTime: number): void {
@@ -336,14 +338,49 @@ export class Game {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  private gameOver(): void {
+  private async gameOver(): Promise<void> {
     this.gameState = GameState.GAME_OVER;
     this.animationLoop.stop();
 
     const finalScore = this.scoreManager.getScore();
-    const linesCleared = this.scoreManager.getTotalLinesCleared();
 
-    alert(`Game Over!\n\nFinal Score: ${finalScore}\nLines Cleared: ${linesCleared}`);
+    // Get/update high score from localStorage
+    const storedHighScore = localStorage.getItem('purrfectBlocksHighScore');
+    const highScore = storedHighScore ? parseInt(storedHighScore) : 0;
+    const newHighScore = Math.max(finalScore, highScore);
+
+    if (newHighScore > highScore) {
+      localStorage.setItem('purrfectBlocksHighScore', newHighScore.toString());
+    }
+
+    // Wait 200ms before showing modal
+    await this.delay(200);
+
+    // Show modal
+    this.showGameOverModal(finalScore, newHighScore);
+  }
+
+  private showGameOverModal(score: number, highScore: number): void {
+    const modal = document.getElementById('game-over-modal');
+    const finalScoreEl = document.getElementById('final-score');
+    const highScoreEl = document.getElementById('high-score');
+    const playAgainBtn = document.getElementById('play-again-btn');
+    const closeBtn = document.getElementById('modal-close-btn');
+
+    if (modal && finalScoreEl && highScoreEl && playAgainBtn && closeBtn) {
+      finalScoreEl.textContent = score.toString();
+      highScoreEl.textContent = highScore.toString();
+      modal.classList.remove('hidden');
+
+      // Setup event listeners
+      const handleRestart = () => {
+        modal.classList.add('hidden');
+        this.restart();
+      };
+
+      playAgainBtn.onclick = handleRestart;
+      closeBtn.onclick = handleRestart;
+    }
   }
 
   restart(): void {
