@@ -8,7 +8,7 @@ export class PanelRenderer {
   private ctx: CanvasRenderingContext2D;
   private cellSize: number;
   private readonly SLOTS = 3;
-  private readonly PIECE_SPACING = 40; // Spacing between pieces
+  private pieceSpacing: number; // Spacing between pieces (responsive)
   private readonly MAX_PIECE_SIZE = 6; // Max piece dimension
   private canvasWidth: number;
   private canvasHeight: number;
@@ -21,9 +21,13 @@ export class PanelRenderer {
     this.ctx = context;
     this.cellSize = cellSize;
 
+    // Responsive spacing: smaller on mobile (10px), larger on desktop (40px)
+    const isMobile = window.innerWidth < 768;
+    this.pieceSpacing = isMobile ? 10 : 40;
+
     // Calculate canvas dimensions based on max piece size
     const maxPieceWidth = this.MAX_PIECE_SIZE * cellSize;
-    this.canvasWidth = maxPieceWidth * this.SLOTS + this.PIECE_SPACING * (this.SLOTS - 1);
+    this.canvasWidth = maxPieceWidth * this.SLOTS + this.pieceSpacing * (this.SLOTS - 1);
     this.canvasHeight = maxPieceWidth;
 
     // Setup canvas size
@@ -46,7 +50,7 @@ export class PanelRenderer {
     for (let i = 0; i < Math.min(pieces.length, this.SLOTS); i++) {
       const piece = pieces[i];
       // Calculate center position for each piece
-      const centerX = (maxPieceWidth / 2) + i * (maxPieceWidth + this.PIECE_SPACING);
+      const centerX = (maxPieceWidth / 2) + i * (maxPieceWidth + this.pieceSpacing);
       const centerY = this.canvasHeight / 2;
 
       PieceRenderer.renderPieceCentered(this.ctx, piece, centerX, centerY, this.cellSize);
@@ -63,7 +67,7 @@ export class PanelRenderer {
 
     // Check which slot was clicked
     for (let i = 0; i < this.SLOTS; i++) {
-      const slotStartX = i * (maxPieceWidth + this.PIECE_SPACING);
+      const slotStartX = i * (maxPieceWidth + this.pieceSpacing);
       const slotEndX = slotStartX + maxPieceWidth;
 
       if (x >= slotStartX && x < slotEndX) {
