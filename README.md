@@ -2,6 +2,8 @@
 
 A cozy block puzzle game with a warm coffee shop aesthetic and interactive cats.
 
+**🎮 [Play Now on GitHub Pages](https://manuelbv.github.io/purrfect-blocks/)**
+
 ## Features
 
 - 12×18 grid with drag-and-drop gameplay
