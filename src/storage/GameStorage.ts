@@ -18,6 +18,7 @@ export class GameStorage {
 
   /**
    * Initialize IndexedDB connection (with localStorage fallback)
+   * This method will NEVER throw - it always falls back to localStorage
    */
   async init(): Promise<void> {
     // Try IndexedDB first
@@ -29,7 +30,21 @@ export class GameStorage {
       console.warn('[GameStorage] IndexedDB failed, falling back to localStorage:', error);
       this.useLocalStorage = true;
       // Migrate existing IndexedDB data to localStorage if possible
-      await this.migrateToLocalStorage();
+      try {
+        await this.migrateToLocalStorage();
+      } catch (migrationError) {
+        console.warn('[GameStorage] Migration failed, starting fresh with localStorage');
+      }
+    }
+
+    // Verify localStorage is actually available
+    try {
+      localStorage.setItem('[GameStorage] test', 'test');
+      localStorage.removeItem('[GameStorage] test');
+      console.log('[GameStorage] Storage initialized successfully (using ' + (this.useLocalStorage ? 'localStorage' : 'IndexedDB') + ')');
+    } catch (storageError) {
+      console.error('[GameStorage] CRITICAL: localStorage is not available!', storageError);
+      // Even if localStorage fails, we don't throw - game can still work without persistence
     }
   }
 

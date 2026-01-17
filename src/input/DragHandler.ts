@@ -51,8 +51,19 @@ export class DragHandler {
     this.dragState.currentX = mouseX;
     this.dragState.currentY = mouseY;
 
-    // Convert to grid coordinates
-    const gridPos = this.screenToGrid(mouseX, mouseY, cellSize);
+    // For touch: adjust grid calculation to account for visual offset (-50%)
+    let adjustedX = mouseX;
+    let adjustedY = mouseY;
+
+    if (this.dragState.isTouch && this.dragState.piece) {
+      const pieceWidth = this.dragState.piece.shape[0].length * cellSize;
+      const pieceHeight = this.dragState.piece.shape.length * cellSize;
+      adjustedX = mouseX - pieceWidth * 0.5;
+      adjustedY = mouseY - pieceHeight * 0.5;
+    }
+
+    // Convert to grid coordinates (use adjusted position for touch)
+    const gridPos = this.screenToGrid(adjustedX, adjustedY, cellSize);
     this.dragState.gridRow = gridPos.row;
     this.dragState.gridCol = gridPos.col;
 
