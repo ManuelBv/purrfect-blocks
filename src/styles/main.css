@@ -19,6 +19,8 @@ body {
   font-family: 'Arial', sans-serif;
   background: linear-gradient(135deg, var(--color-caramel) 0%, var(--color-mocha) 100%);
   min-height: 100vh;
+  width: 100vw;
+  max-width: 100%;
   display: flex;
   flex-direction: column;
   color: var(--color-espresso);
@@ -605,5 +607,64 @@ button:active {
     padding: 30px 20px;
     min-width: 250px;
     max-width: 90vw;
+  }
+}
+
+/* Very small screens (320px width) */
+@media (max-width: 380px) {
+  .game-header {
+    padding: 8px 10px;
+  }
+
+  .game-header h1 {
+    font-size: 1.1rem;
+  }
+
+  .settings-btn-top {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+  }
+
+  #app {
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .player-greeting {
+    font-size: 0.9rem;
+  }
+
+  .hud {
+    font-size: 0.85rem;
+    gap: 8px;
+  }
+
+  .hud-value {
+    font-size: 1rem;
+  }
+
+  .hud-label {
+    font-size: 0.8rem;
+  }
+
+  .game-controls {
+    gap: 8px;
+  }
+
+  .game-controls button {
+    padding: 8px 14px;
+    font-size: 0.85rem;
+  }
+
+  .instructions {
+    font-size: 0.85rem;
+  }
+
+  .instructions p {
+    margin: 3px 0;
+  }
+
+  .game-area {
+    gap: 10px;
   }
 }

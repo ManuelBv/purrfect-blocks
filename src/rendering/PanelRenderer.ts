@@ -19,14 +19,27 @@ export class PanelRenderer {
       throw new Error('Could not get 2d context for panel');
     }
     this.ctx = context;
-    this.cellSize = cellSize;
 
-    // Responsive spacing: smaller on mobile (10px), larger on desktop (40px)
-    const isMobile = window.innerWidth < 768;
-    this.pieceSpacing = isMobile ? 10 : 40;
+    // Responsive spacing: tighter on smaller screens
+    const screenWidth = window.innerWidth;
+    const isMobile = screenWidth < 768;
+
+    // Very small screens (320px): 5px spacing, 25% larger pieces
+    // Mobile (< 768px): 10px spacing
+    // Desktop: 40px spacing
+    if (screenWidth <= 380) {
+      this.pieceSpacing = 5;
+      this.cellSize = cellSize * 1.25; // 25% larger for easier touch
+    } else if (isMobile) {
+      this.pieceSpacing = 10;
+      this.cellSize = cellSize;
+    } else {
+      this.pieceSpacing = 40;
+      this.cellSize = cellSize;
+    }
 
     // Calculate canvas dimensions based on max piece size
-    const maxPieceWidth = this.MAX_PIECE_SIZE * cellSize;
+    const maxPieceWidth = this.MAX_PIECE_SIZE * this.cellSize;
     this.canvasWidth = maxPieceWidth * this.SLOTS + this.pieceSpacing * (this.SLOTS - 1);
     this.canvasHeight = maxPieceWidth;
 
