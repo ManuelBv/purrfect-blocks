@@ -12,6 +12,7 @@ export class PanelRenderer {
   private readonly MAX_PIECE_SIZE = 6; // Max piece dimension
   private canvasWidth: number;
   private canvasHeight: number;
+  private isVerticalLayout: boolean; // Vertical on mobile, horizontal on desktop
 
   constructor(canvas: HTMLCanvasElement, cellSize: number) {
     const context = canvas.getContext('2d');
@@ -23,25 +24,34 @@ export class PanelRenderer {
     // Responsive spacing: tighter on smaller screens
     const screenWidth = window.innerWidth;
     const isMobile = screenWidth < 768;
+    this.isVerticalLayout = isMobile;
 
-    // Very small screens (320px): 5px spacing, 25% larger pieces
-    // Mobile (< 768px): 10px spacing
-    // Desktop: 40px spacing
+    // Very small screens (320px): 8px spacing, 25% larger pieces, vertical
+    // Mobile (< 768px): 12px spacing, vertical layout
+    // Desktop: 40px spacing, horizontal layout
     if (screenWidth <= 380) {
-      this.pieceSpacing = 5;
+      this.pieceSpacing = 8;
       this.cellSize = cellSize * 1.25; // 25% larger for easier touch
     } else if (isMobile) {
-      this.pieceSpacing = 10;
+      this.pieceSpacing = 12;
       this.cellSize = cellSize;
     } else {
       this.pieceSpacing = 40;
       this.cellSize = cellSize;
     }
 
-    // Calculate canvas dimensions based on max piece size
+    // Calculate canvas dimensions based on layout
     const maxPieceWidth = this.MAX_PIECE_SIZE * this.cellSize;
-    this.canvasWidth = maxPieceWidth * this.SLOTS + this.pieceSpacing * (this.SLOTS - 1);
-    this.canvasHeight = maxPieceWidth;
+
+    if (this.isVerticalLayout) {
+      // Vertical layout: pieces stacked on top of each other
+      this.canvasWidth = maxPieceWidth;
+      this.canvasHeight = maxPieceWidth * this.SLOTS + this.pieceSpacing * (this.SLOTS - 1);
+    } else {
+      // Horizontal layout: pieces side by side
+      this.canvasWidth = maxPieceWidth * this.SLOTS + this.pieceSpacing * (this.SLOTS - 1);
+      this.canvasHeight = maxPieceWidth;
+    }
 
     // Setup canvas size
     canvas.width = this.canvasWidth;
@@ -62,9 +72,18 @@ export class PanelRenderer {
 
     for (let i = 0; i < Math.min(pieces.length, this.SLOTS); i++) {
       const piece = pieces[i];
-      // Calculate center position for each piece
-      const centerX = (maxPieceWidth / 2) + i * (maxPieceWidth + this.pieceSpacing);
-      const centerY = this.canvasHeight / 2;
+      let centerX: number;
+      let centerY: number;
+
+      if (this.isVerticalLayout) {
+        // Vertical layout: center horizontally, stack vertically
+        centerX = this.canvasWidth / 2;
+        centerY = (maxPieceWidth / 2) + i * (maxPieceWidth + this.pieceSpacing);
+      } else {
+        // Horizontal layout: stack horizontally, center vertically
+        centerX = (maxPieceWidth / 2) + i * (maxPieceWidth + this.pieceSpacing);
+        centerY = this.canvasHeight / 2;
+      }
 
       PieceRenderer.renderPieceCentered(this.ctx, piece, centerX, centerY, this.cellSize);
     }
@@ -73,18 +92,33 @@ export class PanelRenderer {
   getSlotIndexFromCoordinates(x: number, y: number): number {
     const maxPieceWidth = this.MAX_PIECE_SIZE * this.cellSize;
 
-    // Check if click is within panel bounds vertically
-    if (y < 0 || y > this.canvasHeight) {
-      return -1;
-    }
+    if (this.isVerticalLayout) {
+      // Vertical layout: check which vertical slot was clicked
+      if (x < 0 || x > this.canvasWidth) {
+        return -1;
+      }
 
-    // Check which slot was clicked
-    for (let i = 0; i < this.SLOTS; i++) {
-      const slotStartX = i * (maxPieceWidth + this.pieceSpacing);
-      const slotEndX = slotStartX + maxPieceWidth;
+      for (let i = 0; i < this.SLOTS; i++) {
+        const slotStartY = i * (maxPieceWidth + this.pieceSpacing);
+        const slotEndY = slotStartY + maxPieceWidth;
 
-      if (x >= slotStartX && x < slotEndX) {
-        return i;
+        if (y >= slotStartY && y < slotEndY) {
+          return i;
+        }
+      }
+    } else {
+      // Horizontal layout: check which horizontal slot was clicked
+      if (y < 0 || y > this.canvasHeight) {
+        return -1;
+      }
+
+      for (let i = 0; i < this.SLOTS; i++) {
+        const slotStartX = i * (maxPieceWidth + this.pieceSpacing);
+        const slotEndX = slotStartX + maxPieceWidth;
+
+        if (x >= slotStartX && x < slotEndX) {
+          return i;
+        }
       }
     }
 
