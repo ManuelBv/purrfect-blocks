@@ -5,6 +5,7 @@ export default defineConfig({
   build: {
     outDir: 'dist',
     minify: 'terser',
+    assetsInlineLimit: 100000, // Inline assets smaller than 100KB as base64
     terserOptions: {
       compress: {
         drop_console: true,
@@ -13,7 +14,10 @@ export default defineConfig({
     },
     rollupOptions: {
       output: {
-        manualChunks: undefined,
+        manualChunks: undefined, // Single JS bundle
+        assetFileNames: 'assets/[name].[hash].[ext]',
+        chunkFileNames: 'assets/[name].[hash].js',
+        entryFileNames: 'assets/[name].[hash].js',
       },
     },
   },

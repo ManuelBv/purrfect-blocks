@@ -41,6 +41,7 @@ export class Game {
 
   private gameStorage: GameStorage;
   private autoSaveTimeout: number | null = null;
+  private storageAvailable: boolean = false;
 
   private audioEngine: AudioEngine;
   private soundEffects: SoundEffects;
@@ -116,16 +117,15 @@ export class Game {
   private async init(): Promise<void> {
     console.log('Game init starting...');
 
-    let storageAvailable = false;
-
     // Initialize storage with auto-recovery for corruption
     try {
       console.log('Initializing storage...');
       await this.gameStorage.init();
       console.log('Storage initialized successfully');
-      storageAvailable = true;
+      this.storageAvailable = true;
     } catch (error) {
       console.warn('Database initialization failed, skipping storage:', error);
+      this.storageAvailable = false;
       // Continue without storage - game will work fine
     }
 
@@ -136,7 +136,7 @@ export class Game {
     console.log('High score loaded:', highScore);
 
     // Try to load saved game only if storage is available
-    if (storageAvailable) {
+    if (this.storageAvailable) {
       try {
         console.log('Attempting to load saved game...');
         const savedGame = await this.gameStorage.loadGame();
@@ -538,6 +538,12 @@ export class Game {
    * Save current game state to IndexedDB
    */
   private async saveGame(): Promise<void> {
+    // Skip saving if storage is not available
+    if (!this.storageAvailable) {
+      console.log('Storage not available, skipping auto-save');
+      return;
+    }
+
     try {
       const state = {
         board: this.board.getCells().map(row =>
@@ -557,6 +563,8 @@ export class Game {
       console.log('Game auto-saved');
     } catch (error) {
       console.error('Failed to auto-save game:', error);
+      // If save fails, mark storage as unavailable to prevent future attempts
+      this.storageAvailable = false;
     }
   }
 

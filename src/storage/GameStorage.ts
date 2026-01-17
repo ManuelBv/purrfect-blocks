@@ -22,16 +22,43 @@ export class GameStorage {
       console.log('Opening IndexedDB:', this.dbName, 'version:', this.dbVersion);
       const request = indexedDB.open(this.dbName, this.dbVersion);
 
+      let isResolved = false;
+      let timeoutId: number | null = null;
+
+      const cleanup = () => {
+        if (timeoutId !== null) {
+          clearTimeout(timeoutId);
+          timeoutId = null;
+        }
+      };
+
       request.onerror = () => {
+        if (isResolved) return;
+        isResolved = true;
+        cleanup();
         console.error('IndexedDB failed to open:', request.error);
         reject(request.error);
       };
 
       request.onblocked = () => {
-        console.warn('IndexedDB open blocked - close other tabs');
+        console.warn('IndexedDB open blocked - close other tabs or wait...');
+        // Don't reject immediately, give it more time
+        if (timeoutId !== null) {
+          clearTimeout(timeoutId);
+        }
+        timeoutId = window.setTimeout(() => {
+          if (!isResolved) {
+            isResolved = true;
+            console.error('IndexedDB blocked timeout - database may be open in another tab');
+            reject(new Error('Database blocked: Please close other tabs with this app open'));
+          }
+        }, 10000); // Give 10 seconds for blocked state
       };
 
       request.onsuccess = () => {
+        if (isResolved) return;
+        isResolved = true;
+        cleanup();
         console.log('IndexedDB onsuccess fired');
         this.db = request.result;
         console.log('IndexedDB initialized successfully');
@@ -39,25 +66,26 @@ export class GameStorage {
       };
 
       request.onupgradeneeded = (event) => {
-        console.log('IndexedDB onupgradeneeded fired');
+        console.log('IndexedDB onupgradeneeded fired for GameStorage');
         const db = (event.target as IDBOpenDBRequest).result;
 
-        // Create object store if it doesn't exist
+        // Only manage our own object store, don't touch others (like playerSettings)
         if (!db.objectStoreNames.contains(this.storeName)) {
           db.createObjectStore(this.storeName, { keyPath: 'id' });
           console.log('Created game state object store');
         } else {
-          console.log('Object store already exists');
+          console.log('Game state object store already exists');
         }
       };
 
-      // Timeout after 5 seconds
-      setTimeout(() => {
-        if (!this.db) {
+      // Timeout after 10 seconds (increased from 5)
+      timeoutId = window.setTimeout(() => {
+        if (!isResolved) {
+          isResolved = true;
           console.error('IndexedDB initialization timeout - forcing rejection');
           reject(new Error('Database initialization timeout'));
         }
-      }, 5000);
+      }, 10000);
     });
   }
 

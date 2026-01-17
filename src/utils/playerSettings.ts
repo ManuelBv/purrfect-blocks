@@ -1,11 +1,13 @@
 const DB_NAME = 'PurrfectBlocksDB';
-const DB_VERSION = 1;
+const DB_VERSION = 2; // Updated to match GameStorage version
 const STORE_NAME = 'playerSettings';
 
 export interface PlayerSettings {
   id: string;
   name: string;
   uuid: string;
+  volume?: number; // 0-100
+  muted?: boolean;
 }
 
 export class PlayerSettingsManager {
@@ -15,22 +17,45 @@ export class PlayerSettingsManager {
     return new Promise((resolve, reject) => {
       const request = indexedDB.open(DB_NAME, DB_VERSION);
 
+      let isResolved = false;
+
       request.onerror = () => {
+        if (isResolved) return;
+        isResolved = true;
+        console.error('Failed to open IndexedDB for player settings:', request.error);
         reject(new Error('Failed to open IndexedDB'));
       };
 
       request.onsuccess = () => {
+        if (isResolved) return;
+        isResolved = true;
         this.db = request.result;
+        console.log('PlayerSettings DB initialized successfully');
         resolve();
       };
 
       request.onupgradeneeded = (event) => {
+        console.log('PlayerSettings onupgradeneeded fired');
         const db = (event.target as IDBOpenDBRequest).result;
 
+        // Create playerSettings store if it doesn't exist
         if (!db.objectStoreNames.contains(STORE_NAME)) {
           db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+          console.log('Created playerSettings object store');
         }
       };
+
+      request.onblocked = () => {
+        console.warn('PlayerSettings DB open blocked - close other tabs');
+      };
+
+      // Timeout after 10 seconds
+      setTimeout(() => {
+        if (!isResolved) {
+          isResolved = true;
+          reject(new Error('PlayerSettings DB initialization timeout'));
+        }
+      }, 10000);
     });
   }
 
@@ -39,18 +64,30 @@ export class PlayerSettingsManager {
       await this.init();
     }
 
+    // Check if object store exists
+    if (!this.db || !this.db.objectStoreNames.contains(STORE_NAME)) {
+      console.warn('PlayerSettings object store does not exist');
+      return null;
+    }
+
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([STORE_NAME], 'readonly');
-      const store = transaction.objectStore(STORE_NAME);
-      const request = store.get(playerId);
+      try {
+        const transaction = this.db!.transaction([STORE_NAME], 'readonly');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.get(playerId);
 
-      request.onsuccess = () => {
-        resolve(request.result || null);
-      };
+        request.onsuccess = () => {
+          resolve(request.result || null);
+        };
 
-      request.onerror = () => {
-        reject(new Error('Failed to get player settings'));
-      };
+        request.onerror = () => {
+          console.error('Failed to get player settings:', request.error);
+          reject(new Error('Failed to get player settings'));
+        };
+      } catch (error) {
+        console.error('Error accessing player settings:', error);
+        resolve(null);
+      }
     });
   }
 
@@ -59,18 +96,31 @@ export class PlayerSettingsManager {
       await this.init();
     }
 
+    // Check if object store exists
+    if (!this.db || !this.db.objectStoreNames.contains(STORE_NAME)) {
+      console.warn('PlayerSettings object store does not exist, cannot save');
+      return;
+    }
+
     return new Promise((resolve, reject) => {
-      const transaction = this.db!.transaction([STORE_NAME], 'readwrite');
-      const store = transaction.objectStore(STORE_NAME);
-      const request = store.put(settings);
+      try {
+        const transaction = this.db!.transaction([STORE_NAME], 'readwrite');
+        const store = transaction.objectStore(STORE_NAME);
+        const request = store.put(settings);
 
-      request.onsuccess = () => {
-        resolve();
-      };
+        request.onsuccess = () => {
+          console.log('Player settings saved successfully');
+          resolve();
+        };
 
-      request.onerror = () => {
-        reject(new Error('Failed to save player settings'));
-      };
+        request.onerror = () => {
+          console.error('Failed to save player settings:', request.error);
+          reject(new Error('Failed to save player settings'));
+        };
+      } catch (error) {
+        console.error('Error saving player settings:', error);
+        reject(error);
+      }
     });
   }
 }

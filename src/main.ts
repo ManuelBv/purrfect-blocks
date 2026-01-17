@@ -19,9 +19,15 @@ async function initializePlayerSettings() {
       id: 'default',
       name: 'Player',
       uuid: generateUUID(),
+      volume: 70,
+      muted: false,
     };
     await playerSettingsManager.savePlayerSettings(settings);
   }
+
+  // Ensure volume and muted have default values if not set
+  if (settings.volume === undefined) settings.volume = 70;
+  if (settings.muted === undefined) settings.muted = false;
 
   currentPlayerSettings = settings;
 
@@ -32,12 +38,24 @@ async function initializePlayerSettings() {
 function updateSettingsUI() {
   const playerNameInput = document.getElementById('player-name-input') as HTMLInputElement;
   const playerUuidEl = document.getElementById('player-uuid');
+  const volumeSlider = document.getElementById('volume-slider') as HTMLInputElement;
+  const volumeValue = document.getElementById('volume-value');
+  const muteToggle = document.getElementById('mute-toggle');
 
   if (playerNameInput) {
     playerNameInput.value = currentPlayerSettings.name;
   }
   if (playerUuidEl) {
     playerUuidEl.textContent = currentPlayerSettings.uuid;
+  }
+  if (volumeSlider && volumeValue) {
+    const volume = currentPlayerSettings.volume || 70;
+    volumeSlider.value = volume.toString();
+    volumeValue.textContent = `${volume}%`;
+  }
+  if (muteToggle) {
+    const isMuted = currentPlayerSettings.muted || false;
+    muteToggle.textContent = isMuted ? '🔇' : '🔊';
   }
 }
 
@@ -107,21 +125,39 @@ async function init() {
   const settingsCloseBtn = document.getElementById('settings-close-btn');
   const saveSettingsBtn = document.getElementById('save-settings-btn');
 
+  // Function to close modal and reset unsaved changes
+  const closeModalWithoutSaving = () => {
+    // Reset all settings UI to current saved values
+    updateSettingsUI();
+
+    // Also reset audio engine to saved values
+    const savedVolume = currentPlayerSettings.volume || 70;
+    const savedMuted = currentPlayerSettings.muted || false;
+    game.getAudioEngine().setVolume(savedVolume / 100);
+    game.getAudioEngine().setMuted(savedMuted);
+
+    if (settingsModal) {
+      settingsModal.classList.add('hidden');
+    }
+  };
+
   if (settingsBtnTop && settingsModal) {
     settingsBtnTop.addEventListener('click', () => {
       settingsModal.classList.remove('hidden');
+      // Refresh UI when opening to show current values
+      updateSettingsUI();
     });
   }
 
   if (settingsCloseBtn && settingsModal) {
     settingsCloseBtn.addEventListener('click', () => {
-      settingsModal.classList.add('hidden');
+      closeModalWithoutSaving();
     });
 
     // Close modal when clicking outside
     settingsModal.addEventListener('click', (event) => {
       if (event.target === settingsModal) {
-        settingsModal.classList.add('hidden');
+        closeModalWithoutSaving();
       }
     });
   }
@@ -130,9 +166,18 @@ async function init() {
   if (saveSettingsBtn) {
     saveSettingsBtn.addEventListener('click', async () => {
       const playerNameInput = document.getElementById('player-name-input') as HTMLInputElement;
-      const newName = playerNameInput.value.trim() || 'Player';
+      const volumeSlider = document.getElementById('volume-slider') as HTMLInputElement;
+      const muteToggle = document.getElementById('mute-toggle');
 
+      const newName = playerNameInput.value.trim() || 'Player';
+      const newVolume = volumeSlider ? parseInt(volumeSlider.value) : 70;
+      const isMuted = muteToggle?.textContent === '🔇';
+
+      // Update settings - UUID is read-only and cannot be changed
       currentPlayerSettings.name = newName;
+      currentPlayerSettings.volume = newVolume;
+      currentPlayerSettings.muted = isMuted;
+
       await playerSettingsManager.savePlayerSettings(currentPlayerSettings);
 
       updateGreeting();
@@ -147,7 +192,13 @@ async function init() {
   const volumeSlider = document.getElementById('volume-slider') as HTMLInputElement;
   const volumeValue = document.getElementById('volume-value');
 
+  // Initialize volume from saved settings
   if (volumeSlider && volumeValue) {
+    const savedVolume = currentPlayerSettings.volume || 70;
+    volumeSlider.value = savedVolume.toString();
+    volumeValue.textContent = `${savedVolume}%`;
+    game.getAudioEngine().setVolume(savedVolume / 100);
+
     volumeSlider.addEventListener('input', () => {
       const volume = parseInt(volumeSlider.value);
       volumeValue.textContent = `${volume}%`;
@@ -157,13 +208,18 @@ async function init() {
 
   // Setup mute toggle
   const muteToggle = document.getElementById('mute-toggle');
-  let isMuted = false;
 
+  // Initialize mute state from saved settings
   if (muteToggle) {
+    const savedMuted = currentPlayerSettings.muted || false;
+    muteToggle.textContent = savedMuted ? '🔇' : '🔊';
+    game.getAudioEngine().setMuted(savedMuted);
+
     muteToggle.addEventListener('click', () => {
-      isMuted = !isMuted;
-      game.getAudioEngine().setMuted(isMuted);
-      muteToggle.textContent = isMuted ? '🔇 Muted' : '🔊 Unmuted';
+      const currentlyMuted = muteToggle.textContent === '🔇';
+      const newMutedState = !currentlyMuted;
+      game.getAudioEngine().setMuted(newMutedState);
+      muteToggle.textContent = newMutedState ? '🔇' : '🔊';
     });
   }
 
