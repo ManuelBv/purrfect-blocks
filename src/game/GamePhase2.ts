@@ -80,6 +80,11 @@ export class Game {
     panelCanvas.addEventListener('mousedown', this.handlePanelClick.bind(this));
     panelCanvas.addEventListener('touchstart', this.handlePanelTouch.bind(this), { passive: false });
 
+    // Global touch handlers for continuous dragging (like mouse events)
+    document.addEventListener('touchmove', this.handleGlobalTouchMove.bind(this), { passive: false });
+    document.addEventListener('touchend', this.handleGlobalTouchEnd.bind(this), { passive: false });
+    document.addEventListener('touchcancel', this.handleGlobalTouchEnd.bind(this), { passive: false });
+
     this.animationLoop = new AnimationLoop(this.update.bind(this));
 
     this.gameStorage = new GameStorage();
@@ -354,6 +359,38 @@ export class Game {
         // Start dragging this piece
         this.inputManager.startDragFromPanel(piece, mouseEvent);
       }
+    }
+  }
+
+  private handleGlobalTouchMove(event: TouchEvent): void {
+    const dragHandler = this.inputManager.getDragHandler();
+    if (!dragHandler.isDragging()) return;
+
+    event.preventDefault();
+
+    if (event.touches.length === 0) return;
+
+    const touch = event.touches[0];
+    const boardCanvas = this.boardRenderer['canvas'];
+    const rect = boardCanvas.getBoundingClientRect();
+    const x = touch.clientX - rect.left;
+    const y = touch.clientY - rect.top;
+
+    // Update drag position (same as mouse move)
+    dragHandler['dragState'].currentX = x;
+    dragHandler['dragState'].currentY = y;
+  }
+
+  private handleGlobalTouchEnd(event: TouchEvent): void {
+    const dragHandler = this.inputManager.getDragHandler();
+    if (!dragHandler.isDragging()) return;
+
+    event.preventDefault();
+
+    const result = dragHandler.endDrag();
+
+    if (result) {
+      this.handlePiecePlaced(result.piece, result.row, result.col);
     }
   }
 
