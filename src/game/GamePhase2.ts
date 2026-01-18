@@ -16,10 +16,12 @@ import { ClearAnimationManager } from '../rendering/ClearAnimationManager';
 import { GameState } from '../types/GameTypes';
 import type { VisualEffect } from '../types/RenderTypes';
 import type { Piece } from '../pieces/Piece';
+import { BombPiece } from '../pieces/BombPiece';
 import { clearBoardCanvas } from '../utils/CanvasUtils';
 import { GameStorage } from '../storage/GameStorage';
 import { AudioEngine } from '../audio/AudioEngine';
 import { SoundEffects } from '../audio/SoundEffects';
+import { getRandomBombMessage } from '../utils/kittenMessages';
 
 export class Game {
   private board: GameBoard;
@@ -174,6 +176,7 @@ export class Game {
     const buttons = [
       { id: 'test-piece-placed', handler: () => this.soundEffects.playPiecePlaced() },
       { id: 'test-line-clear', handler: () => this.soundEffects.playLineClear() },
+      { id: 'test-bomb-explosion', handler: () => this.soundEffects.playBombExplosion() },
       { id: 'test-cascade-2x', handler: () => this.soundEffects.playCascade(2) },
       { id: 'test-cascade-3x', handler: () => this.soundEffects.playCascade(3) },
       { id: 'test-cascade-4x', handler: () => this.soundEffects.playCascade(4) },
@@ -409,6 +412,9 @@ export class Game {
     // Play piece placement sound
     this.soundEffects.playPiecePlaced();
 
+    // Check if this is a bomb piece
+    const isBomb = piece instanceof BombPiece;
+
     // Place piece on board
     this.board.placePiece(piece.shape, row, col, piece.color, piece.id);
 
@@ -418,8 +424,55 @@ export class Game {
       this.pieceManager.consumePiece(selectedIndex);
     }
 
+    // Handle bomb explosion before cascades
+    if (isBomb) {
+      this.handleBombExplosion(row, col);
+    }
+
     // Process cascades with animation
     this.processCascadeWithAnimation();
+  }
+
+  private async handleBombExplosion(centerRow: number, centerCol: number): Promise<void> {
+    // Small delay to show the bomb placement
+    await this.delay(150);
+
+    // Schedule the explosion animation BEFORE clearing blocks
+    this.clearAnimationManager.scheduleExplosion(centerRow, centerCol, this.board);
+
+    // Play bomb explosion sound (cat hiss and claw) at the start of the animation
+    this.soundEffects.playBombExplosion();
+
+    // Wait for animation to complete
+    const animDuration = this.clearAnimationManager.getTotalDuration();
+    console.log('Explosion animation duration:', animDuration, 'ms');
+
+    // Wait while animation is playing
+    const startTime = Date.now();
+    while (this.clearAnimationManager.isAnimating()) {
+      await this.delay(16); // Wait one frame
+    }
+    console.log('Explosion animation completed after', Date.now() - startTime, 'ms');
+
+    // Now actually clear the blocks
+    const blocksCleared = this.board.explode3x3(centerRow, centerCol);
+
+    if (blocksCleared > 0) {
+      // Add explosion score (50 points per block)
+      const explosionScore = this.scoreManager.addExplosionScore(blocksCleared);
+
+      // Show random kitten message
+      const kittenMessage = getRandomBombMessage();
+      this.hudRenderer.showMessage(`${kittenMessage}! +${explosionScore}`);
+
+      console.log(`Bomb explosion cleared ${blocksCleared} blocks for ${explosionScore} points`);
+    }
+
+    // Clear animation state
+    this.clearAnimationManager.clear();
+
+    // Small delay before cascade processing
+    await this.delay(100);
   }
 
   private async processCascadeWithAnimation(): Promise<void> {

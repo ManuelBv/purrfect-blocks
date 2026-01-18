@@ -9,10 +9,17 @@ export class PieceManager {
   private factory: PieceFactory;
   private availablePieces: Piece[];
   private selectedIndex: number = -1;
+  private turnsSinceLastBomb: number = 0;
+  private turnsUntilNextBomb: number = this.randomTurnsUntilBomb();
 
   constructor() {
     this.factory = new PieceFactory();
     this.availablePieces = this.factory.createMultiplePieces(PIECE_CONFIG.PANEL_SIZE);
+  }
+
+  private randomTurnsUntilBomb(): number {
+    // Random number between 3 and 5 (inclusive)
+    return Math.floor(Math.random() * 3) + 3;
   }
 
   getAvailablePieces(): Piece[] {
@@ -35,9 +42,22 @@ export class PieceManager {
 
     const piece = this.availablePieces[index];
 
-    // Replace consumed piece with new one (with potential bomb if combo >= 1.5x)
-    const newPieces = this.factory.createMultiplePieces(1, comboMultiplier);
-    this.availablePieces[index] = newPieces[0];
+    // Increment turn counter
+    this.turnsSinceLastBomb++;
+
+    // Check if it's time to spawn a bomb
+    const shouldSpawnBomb = this.turnsSinceLastBomb >= this.turnsUntilNextBomb;
+
+    if (shouldSpawnBomb) {
+      // Reset counters and spawn bomb
+      this.turnsSinceLastBomb = 0;
+      this.turnsUntilNextBomb = this.randomTurnsUntilBomb();
+      this.availablePieces[index] = this.factory.createBombPiece();
+    } else {
+      // Create a normal random piece
+      this.availablePieces[index] = this.factory.createRandomPiece();
+    }
+
     this.selectedIndex = -1;
 
     return piece;
@@ -75,5 +95,7 @@ export class PieceManager {
   reset(): void {
     this.availablePieces = this.factory.createMultiplePieces(PIECE_CONFIG.PANEL_SIZE);
     this.selectedIndex = -1;
+    this.turnsSinceLastBomb = 0;
+    this.turnsUntilNextBomb = this.randomTurnsUntilBomb();
   }
 }

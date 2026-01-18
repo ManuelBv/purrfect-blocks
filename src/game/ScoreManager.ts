@@ -40,4 +40,15 @@ export class ScoreManager {
   resetCombo(): void {
     this.comboMultiplier = 1.0;
   }
+
+  /**
+   * Add points for bomb explosion
+   * @param blocksCleared Number of blocks cleared by explosion
+   * @returns Points earned
+   */
+  addExplosionScore(blocksCleared: number): number {
+    const points = blocksCleared * 50; // 50 points per block
+    this.score += points;
+    return points;
+  }
 }

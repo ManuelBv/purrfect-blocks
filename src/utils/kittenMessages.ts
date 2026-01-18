@@ -13,8 +13,26 @@ export const KITTEN_MESSAGES = [
 
 export const KITTEN_EMOJIS = ['🐾', '😺', '😸', '😻', '🐱', '🎀', '🧶', '🐟'];
 
+export const BOMB_MESSAGES = [
+  'Mewtastic',
+  'Purrfect',
+  'Fur-midable',
+  'Claw-some',
+  'Meow-nificent',
+  'Purr-fection',
+  'Catastrophic',
+  'Feline Fine',
+  'Kitty Boom',
+  'Yarn Chaos',
+  'Paws-itively Explosive',
+];
+
 export function getRandomKittenMessage(): string {
   return KITTEN_MESSAGES[Math.floor(Math.random() * KITTEN_MESSAGES.length)];
+}
+
+export function getRandomBombMessage(): string {
+  return BOMB_MESSAGES[Math.floor(Math.random() * BOMB_MESSAGES.length)];
 }
 
 export function getRandomKittenEmojis(): string {

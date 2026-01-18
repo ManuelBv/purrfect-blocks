@@ -94,4 +94,33 @@ export class SoundEffects {
     // Short low buzz
     this.audioEngine.playTone(150, 0.1, 'square');
   }
+
+  /**
+   * Bomb explosion - cat hiss and claw attack sound
+   * Sharp hissing noise followed by rapid scratching
+   */
+  playBombExplosion(): void {
+    // Hiss: High-frequency noise burst (like air escaping / cat hissing)
+    this.audioEngine.playNoise(0.15, 4000); // High-pass filtered noise for "sssss" hiss
+
+    // Claw swipe 1: Quick descending tone (swipe sound)
+    setTimeout(() => {
+      this.audioEngine.playTone(800, 0.04, 'sawtooth');
+      this.audioEngine.playTone(600, 0.04, 'sawtooth');
+    }, 50);
+
+    // Claw swipe 2: Another quick swipe
+    setTimeout(() => {
+      this.audioEngine.playTone(750, 0.04, 'sawtooth');
+      this.audioEngine.playTone(550, 0.04, 'sawtooth');
+    }, 100);
+
+    // Claw swipe 3: Final rapid swipe with impact
+    setTimeout(() => {
+      this.audioEngine.playTone(700, 0.05, 'sawtooth');
+      this.audioEngine.playTone(500, 0.05, 'sawtooth');
+      // Impact thud
+      this.audioEngine.playNoise(0.06, 200);
+    }, 150);
+  }
 }

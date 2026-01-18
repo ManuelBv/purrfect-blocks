@@ -164,6 +164,31 @@ export class GameBoard {
     return board;
   }
 
+  /**
+   * Explode a 3x3 area around the specified position
+   * @param centerRow Center row of explosion
+   * @param centerCol Center column of explosion
+   * @returns Number of blocks cleared by the explosion
+   */
+  explode3x3(centerRow: number, centerCol: number): number {
+    let clearedCount = 0;
+
+    // Clear 3x3 area
+    for (let r = centerRow - 1; r <= centerRow + 1; r++) {
+      for (let c = centerCol - 1; c <= centerCol + 1; c++) {
+        // Check bounds
+        if (r >= 0 && r < this.rows && c >= 0 && c < this.cols) {
+          if (this.cells[r][c].occupied) {
+            this.cells[r][c].clear();
+            clearedCount++;
+          }
+        }
+      }
+    }
+
+    return clearedCount;
+  }
+
   clear(): void {
     for (let r = 0; r < this.rows; r++) {
       for (let c = 0; c < this.cols; c++) {

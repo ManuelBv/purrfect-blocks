@@ -135,6 +135,48 @@ export class ClearAnimationManager {
     });
   }
 
+  /**
+   * Schedule explosion animation for 3x3 bomb blast
+   * Animates from center outward in a radial pattern
+   */
+  scheduleExplosion(centerRow: number, centerCol: number, board: { getCell(r: number, c: number): any }): void {
+    this.animations = [];
+    const currentTime = Date.now();
+
+    // Collect all blocks in 3x3 area with distance from center
+    const blocks: Array<{ row: number; col: number; distance: number; color: string }> = [];
+
+    for (let r = centerRow - 1; r <= centerRow + 1; r++) {
+      for (let c = centerCol - 1; c <= centerCol + 1; c++) {
+        const cell = board.getCell(r, c);
+        if (cell && cell.occupied) {
+          // Calculate Manhattan distance from center for stagger effect
+          const distance = Math.abs(r - centerRow) + Math.abs(c - centerCol);
+          blocks.push({
+            row: r,
+            col: c,
+            distance: distance,
+            color: cell.color || '#8B4513'
+          });
+        }
+      }
+    }
+
+    // Create animations with stagger based on distance from center
+    blocks.forEach(({ row, col, distance, color }) => {
+      const delay = distance * this.staggerDelay;
+      this.animations.push({
+        row,
+        col,
+        startTime: currentTime + delay,
+        duration: this.animationDuration,
+        color
+      });
+    });
+
+    console.log('Created', this.animations.length, 'explosion animations');
+  }
+
   clear(): void {
     this.animations = [];
   }
