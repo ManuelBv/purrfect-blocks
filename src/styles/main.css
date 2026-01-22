@@ -24,7 +24,7 @@ body {
   display: flex;
   flex-direction: column;
   color: var(--color-espresso);
-  overflow-x: hidden;
+  overflow-x: visible; /* Allow cats to show on sides */
 }
 
 /* Responsive Header */
@@ -99,6 +99,7 @@ body {
   flex-direction: column;
   align-items: center;
   gap: 15px;
+  overflow: visible; /* Allow cats canvas to extend beyond */
 }
 
 #board-canvas {
@@ -117,6 +118,15 @@ body {
   left: 0;
   pointer-events: none;
   z-index: 10;
+  /* Sized dynamically to cover entire game-area */
+}
+
+.cats-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 5; /* Below effects but above board */
   /* Sized dynamically to cover entire game-area */
 }
 
@@ -554,6 +564,104 @@ button:active {
 .audio-test-buttons button {
   padding: 8px 16px;
   font-size: 0.9rem;
+}
+
+/* Cat Test Panel */
+.cat-test-panel {
+  margin-top: 20px;
+  padding: 20px;
+  background: rgba(62, 39, 35, 0.3);
+  border-radius: 10px;
+  text-align: center;
+  max-width: 400px;
+}
+
+.cat-test-panel h3 {
+  color: var(--color-cream);
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+.cat-test-controls {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.cat-test-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.cat-test-row label {
+  color: var(--color-cream);
+  font-size: 0.9rem;
+  min-width: 80px;
+  text-align: left;
+}
+
+.cat-test-row select {
+  flex: 1;
+  padding: 8px;
+  border-radius: 5px;
+  border: 1px solid var(--color-caramel);
+  background: var(--color-cream);
+  font-size: 0.9rem;
+}
+
+.cat-test-row input[type="range"] {
+  flex: 1;
+  height: 6px;
+}
+
+#cat-scale-value {
+  color: var(--color-cream);
+  font-size: 0.9rem;
+  min-width: 30px;
+}
+
+.cat-test-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.cat-test-buttons button {
+  padding: 8px 16px;
+  font-size: 0.85rem;
+}
+
+.cat-test-canvas-wrapper {
+  display: flex;
+  justify-content: center;
+  margin: 15px 0;
+}
+
+#cat-test-canvas {
+  background: #2a1810;
+  border: 2px solid var(--color-caramel);
+  border-radius: 8px;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+}
+
+.cat-test-info {
+  color: var(--color-latte);
+  font-size: 0.85rem;
+}
+
+.cat-test-info p {
+  margin: 5px 0;
+}
+
+.cat-test-info span {
+  color: var(--color-cream);
+  font-family: 'Courier New', monospace;
 }
 
 /* Mobile responsiveness */

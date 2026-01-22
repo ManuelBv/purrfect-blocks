@@ -33,6 +33,7 @@
 
     <div class="game-area">
       <canvas id="effects-canvas" class="effects-overlay"></canvas>
+      <canvas id="cats-canvas" class="cats-overlay"></canvas>
 
       <canvas id="board-canvas" class="game-canvas"></canvas>
 
@@ -63,6 +64,45 @@
         <button id="test-game-over">Game Over</button>
         <button id="test-success">Success</button>
         <button id="test-invalid">Invalid</button>
+      </div>
+    </div>
+
+    <!-- Cat Sprite Tester -->
+    <div class="cat-test-panel">
+      <h3>Cat Sprite Tester 🐱</h3>
+      <div class="cat-test-controls">
+        <div class="cat-test-row">
+          <label for="cat-type-select">Cat Type:</label>
+          <select id="cat-type-select">
+            <option value="ORANGE_TABBY">Orange Tabby</option>
+            <option value="WHITE_LONGHAIR">White Longhair</option>
+          </select>
+        </div>
+        <div class="cat-test-row">
+          <label for="cat-state-select">Sprite:</label>
+          <select id="cat-state-select">
+            <option value="sitting">Sitting (19x21)</option>
+            <option value="standing">Standing (24x19)</option>
+            <option value="lying">Lying (24x14)</option>
+          </select>
+        </div>
+        <div class="cat-test-row">
+          <label for="cat-scale-slider">Scale:</label>
+          <input type="range" id="cat-scale-slider" min="1" max="8" value="4">
+          <span id="cat-scale-value">4x</span>
+        </div>
+        <div class="cat-test-buttons">
+          <button id="cat-test-render">Render Cat</button>
+          <button id="cat-test-flip">Flip Horizontal</button>
+          <button id="cat-test-clear">Clear</button>
+        </div>
+      </div>
+      <div class="cat-test-canvas-wrapper">
+        <canvas id="cat-test-canvas" width="200" height="200"></canvas>
+      </div>
+      <div class="cat-test-info">
+        <p>Sprite: <span id="cat-sprite-info">-</span></p>
+        <p>Dimensions: <span id="cat-dimensions-info">-</span></p>
       </div>
     </div>
 

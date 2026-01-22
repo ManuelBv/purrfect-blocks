@@ -3,6 +3,8 @@
 import { Game } from './game/GamePhase2';
 import { PlayerSettingsManager, PlayerSettings, generateUUID } from './utils/playerSettings';
 import { generateGreeting } from './utils/kittenMessages';
+import { CatTester } from './rendering/CatTester';
+import type { CatType } from './entities/Cat';
 import './styles/main.css';
 
 let playerSettingsManager: PlayerSettingsManager;
@@ -73,12 +75,13 @@ async function init() {
   const boardCanvas = document.getElementById('board-canvas') as HTMLCanvasElement;
   const panelCanvas = document.getElementById('panel-canvas') as HTMLCanvasElement;
   const effectsCanvas = document.getElementById('effects-canvas') as HTMLCanvasElement;
+  const catsCanvas = document.getElementById('cats-canvas') as HTMLCanvasElement;
 
   if (!boardCanvas || !panelCanvas || !effectsCanvas) {
     throw new Error('Canvas elements not found');
   }
 
-  const game = new Game(boardCanvas, panelCanvas, effectsCanvas);
+  const game = new Game(boardCanvas, panelCanvas, effectsCanvas, catsCanvas);
 
   // Setup restart button
   const restartBtn = document.getElementById('restart-btn');
@@ -223,7 +226,89 @@ async function init() {
     });
   }
 
+  // Initialize Cat Tester
+  initCatTester();
+
   console.log('Purrfect Blocks Phase 2 initialized! 🐱☕ Drag pieces from panel to board!');
+}
+
+function initCatTester() {
+  const catTestCanvas = document.getElementById('cat-test-canvas') as HTMLCanvasElement;
+  if (!catTestCanvas) return;
+
+  const catTester = new CatTester(catTestCanvas);
+
+  // Get UI elements
+  const typeSelect = document.getElementById('cat-type-select') as HTMLSelectElement;
+  const stateSelect = document.getElementById('cat-state-select') as HTMLSelectElement;
+  const scaleSlider = document.getElementById('cat-scale-slider') as HTMLInputElement;
+  const scaleValue = document.getElementById('cat-scale-value');
+  const renderBtn = document.getElementById('cat-test-render');
+  const flipBtn = document.getElementById('cat-test-flip');
+  const clearBtn = document.getElementById('cat-test-clear');
+  const spriteInfo = document.getElementById('cat-sprite-info');
+  const dimensionsInfo = document.getElementById('cat-dimensions-info');
+
+  // Update info display
+  const updateInfo = () => {
+    const info = catTester.getSpriteInfo();
+    if (spriteInfo) spriteInfo.textContent = info.name;
+    if (dimensionsInfo) dimensionsInfo.textContent = `${info.width}x${info.height}`;
+  };
+
+  // Scale slider
+  if (scaleSlider && scaleValue) {
+    scaleSlider.addEventListener('input', () => {
+      const scale = parseInt(scaleSlider.value);
+      scaleValue.textContent = `${scale}x`;
+      catTester.setScale(scale);
+      catTester.render();
+    });
+  }
+
+  // Type select
+  if (typeSelect) {
+    typeSelect.addEventListener('change', () => {
+      catTester.setType(typeSelect.value as CatType);
+      catTester.render();
+    });
+  }
+
+  // State/sprite select
+  if (stateSelect) {
+    stateSelect.addEventListener('change', () => {
+      catTester.setSprite(stateSelect.value as 'sitting' | 'standing' | 'lying');
+      catTester.render();
+      updateInfo();
+    });
+  }
+
+  // Render button
+  if (renderBtn) {
+    renderBtn.addEventListener('click', () => {
+      catTester.render();
+      updateInfo();
+    });
+  }
+
+  // Flip button
+  if (flipBtn) {
+    flipBtn.addEventListener('click', () => {
+      catTester.toggleFlip();
+      catTester.render();
+    });
+  }
+
+  // Clear button
+  if (clearBtn) {
+    clearBtn.addEventListener('click', () => {
+      catTester.clear();
+    });
+  }
+
+  // Initial render
+  catTester.render();
+  updateInfo();
 }
 
 // Initialize when DOM is ready

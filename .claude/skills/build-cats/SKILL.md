@@ -14,6 +14,41 @@ Converts pixel art images into sprite matrices for the Purrfect Blocks cat rende
 /build-cats (then provide image in chat)
 ```
 
+## Python Converter Tool
+
+For automated conversion, use the Python script in this directory:
+
+```bash
+# Install dependencies first
+pip install Pillow numpy
+
+# Convert an image to sprite matrix
+python .claude/skills/build-cats/sprite_converter.py cat_sitting.png --name sittingSprite
+
+# Analyze image colors without converting
+python .claude/skills/build-cats/sprite_converter.py cat_sitting.png --analyze
+
+# Save output to file
+python .claude/skills/build-cats/sprite_converter.py cat.png --name newSprite --output sprites.ts
+```
+
+The Python script:
+- Reads PNG/JPG images with transparency support
+- Maps colors to the 9-color palette (0-8)
+- Outputs TypeScript-ready 2D arrays
+- Shows color analysis for debugging
+
+## Testing Sprites
+
+Use the Cat Sprite Tester in the game UI (below the Audio Test panel) to:
+- Preview sprites with different cat types (Orange Tabby / White Longhair)
+- Switch between sitting, standing, and lying sprites
+- Adjust scale (1x-8x)
+- Flip horizontally
+- Test on a dark background
+
+Run the dev server: `npm run dev`
+
 ## Process
 
 ### Step 1: Read the Image
