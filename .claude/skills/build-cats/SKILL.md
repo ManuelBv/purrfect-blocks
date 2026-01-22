@@ -10,9 +10,13 @@ Converts pixel art images into sprite matrices for the Purrfect Blocks cat rende
 ## Usage
 
 ```
-/build-cats [image-path]
-/build-cats (then provide image in chat)
+/build-cats [image-path]     # For saved image files
+/build-cats                  # Then upload screenshot in chat
 ```
+
+**Two conversion methods:**
+1. **Screenshot in chat** - Claude is multimodal and can SEE uploaded images. Simply upload the pixel art and Claude will manually analyze and convert it.
+2. **Image file on disk** - Use the Python script for automated conversion.
 
 ## Python Converter Tool
 
@@ -51,9 +55,15 @@ Run the dev server: `npm run dev`
 
 ## Process
 
-### Step 1: Read the Image
+### Step 1: Get the Image
 
-Use the Read tool to view the provided image file. The image should be:
+**Option A - Screenshot uploaded in chat:**
+Claude is multimodal and can SEE images uploaded directly in the conversation. Simply look at the image and analyze it visually.
+
+**Option B - Image file path:**
+Use the Read tool to view the image file. Claude can read PNG, JPG, and other image formats.
+
+The image should be:
 - Pixel art style (clear, distinct pixels)
 - Preferably on transparent or solid background
 - Cat in a clear pose

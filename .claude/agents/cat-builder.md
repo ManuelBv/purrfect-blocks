@@ -40,14 +40,16 @@ The game uses 2D number matrices to render pixel art cats on HTML5 Canvas. Each 
 ## When Invoked
 
 You will receive one of:
-1. A screenshot/image of pixel art cat(s)
-2. A description of a cat pose to create
-3. A request to add animation frames
+1. A screenshot/image uploaded directly in the chat (Claude is multimodal and can see it)
+2. A path to an image file on disk
+3. A description of a cat pose to create
+4. A request to add animation frames
 
 ### Workflow
 
 1. **Analyze the input:**
-   - If image: Use the `/build-cats` skill to extract the sprite matrix
+   - If screenshot in chat: You can SEE the image directly! Analyze the pixels visually and manually convert to matrix
+   - If image file path: Use the Python script at `.claude/skills/build-cats/sprite_converter.py`
    - If description: Design the sprite based on existing style
 
 2. **Generate the sprite matrix:**
@@ -97,15 +99,35 @@ private walkFrames: number[][][] = [
 ];
 ```
 
-## Skill Integration
+## Converting Screenshots from Chat
 
-For image-to-sprite conversion, invoke:
-```
-/build-cats [path-to-image]
+When the user uploads a screenshot directly in the chat, you can SEE it (Claude is multimodal). To convert:
+
+1. **Look at the image** - Count pixels, identify colors
+2. **Map colors to palette indices:**
+   - Transparent/background → 0
+   - Darkest outlines → 1
+   - Dark shading → 2
+   - Mid-tone fur → 3
+   - Light fur → 4
+   - Highlights/cream → 5
+   - Pink (ears/nose) → 6
+   - Eye dark parts → 7
+   - Eye highlights → 8
+
+3. **Build the matrix row by row** - Start from top-left, go left-to-right, top-to-bottom
+
+4. **Output TypeScript format** with row/column comments
+
+## Python Script for Image Files
+
+For saved image files on disk, use:
+```bash
+python .claude/skills/build-cats/sprite_converter.py <image_path> --name spriteName
 ```
 
-The skill will:
-1. Read the image
+The script will:
+1. Read the image file
 2. Analyze pixel colors
 3. Map to color palette indices
 4. Output the sprite matrix

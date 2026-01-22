@@ -1,6 +1,7 @@
 // Cat Sprite Tester - for testing and previewing cat sprites
 
 import type { CatType } from '../entities/Cat';
+import { sittingCatFullSprite } from './sprites/SittingCatFullSprite';
 
 // Color indices for sprite matrices
 // 0 = transparent
@@ -13,7 +14,7 @@ import type { CatType } from '../entities/Cat';
 // 7 = eye dark
 // 8 = eye highlight
 
-type SpriteType = 'sitting' | 'standing' | 'lying';
+type SpriteType = 'sitting' | 'sitting2' | 'standing' | 'lying' | 'sittingFull';
 
 export class CatTester {
   private canvas: HTMLCanvasElement;
@@ -69,6 +70,28 @@ export class CatTester {
     [0,0,1,4,4,1,1,4,4,0,4,4,1,1,4,4,1,0,0,0,0,0,0,0],
     [0,0,1,1,1,1,1,1,1,0,1,1,1,1,1,1,1,0,0,0,0,0,0,0],
     [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  ];
+
+  // Sitting cat sprite v2 (from public/cat-sitting.png) - 18 wide x 17 tall
+  private sittingSprite2: number[][] = [
+    //0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7
+    [0,0,0,0,1,1,0,0,0,0,0,0,1,1,0,0,0,0], // 0 - ear tips
+    [0,0,0,1,3,2,1,0,0,0,0,1,2,3,1,0,0,0], // 1 - ears outer
+    [0,0,0,1,6,3,1,1,1,1,1,1,3,6,1,0,0,0], // 2 - ears pink inner
+    [0,0,1,2,3,3,3,3,3,3,3,3,3,3,2,1,0,0], // 3 - top of head
+    [0,0,1,3,4,4,4,4,4,4,4,4,4,4,3,1,0,0], // 4 - forehead
+    [0,0,1,3,7,7,4,4,4,4,4,4,7,7,3,1,0,0], // 5 - eyes
+    [0,0,1,3,7,8,4,4,4,4,4,4,8,7,3,1,0,0], // 6 - eyes highlight
+    [0,0,1,3,4,4,4,4,4,4,4,4,4,4,3,1,0,0], // 7 - cheeks
+    [0,0,1,3,4,4,4,1,6,6,1,4,4,4,3,1,0,0], // 8 - nose/mouth
+    [0,0,1,2,3,4,4,4,4,4,4,4,4,3,2,1,0,0], // 9 - chin
+    [0,0,1,2,3,3,3,3,3,3,3,3,3,3,2,1,1,0], // 10 - neck
+    [0,1,2,3,3,2,3,2,3,2,3,2,3,3,2,1,3,1], // 11 - body stripes + tail
+    [0,1,2,3,3,3,3,3,3,3,3,3,3,3,2,1,3,1], // 12 - body + tail
+    [0,1,2,3,3,2,3,2,3,2,3,2,3,3,2,1,1,0], // 13 - body stripes
+    [0,1,2,4,4,1,1,1,1,1,1,1,4,4,2,1,0,0], // 14 - paws
+    [0,0,1,1,1,1,0,0,0,0,0,1,1,1,1,0,0,0], // 15 - paw bottom
+    [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0], // 16 - empty
   ];
 
   // Lying down cat sprite - 24 wide x 14 tall
@@ -146,10 +169,14 @@ export class CatTester {
 
   getSprite(): number[][] {
     switch (this.currentSprite) {
+      case 'sitting2':
+        return this.sittingSprite2;
       case 'standing':
         return this.standingSprite;
       case 'lying':
         return this.lyingSprite;
+      case 'sittingFull':
+        return sittingCatFullSprite;
       default:
         return this.sittingSprite;
     }
@@ -162,8 +189,10 @@ export class CatTester {
 
     const names: Record<SpriteType, string> = {
       sitting: 'sittingSprite',
+      sitting2: 'sittingSprite2',
       standing: 'standingSprite',
       lying: 'lyingSprite',
+      sittingFull: 'sittingCatFullSprite (123x124)',
     };
 
     return {

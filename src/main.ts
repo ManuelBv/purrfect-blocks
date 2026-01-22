@@ -277,7 +277,7 @@ function initCatTester() {
   // State/sprite select
   if (stateSelect) {
     stateSelect.addEventListener('change', () => {
-      catTester.setSprite(stateSelect.value as 'sitting' | 'standing' | 'lying');
+      catTester.setSprite(stateSelect.value as 'sitting' | 'sitting2' | 'standing' | 'lying' | 'sittingFull');
       catTester.render();
       updateInfo();
     });

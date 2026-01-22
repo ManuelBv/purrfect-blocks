@@ -70,6 +70,7 @@ Custom agents in `.claude/agents/`:
 
 | Agent | Purpose |
 |-------|---------|
+| `orchestrator` | **Workflow coordinator** - directs full workflows or individual agents |
 | `cat-builder` | Convert pixel art to sprite matrices for cats |
 | `code-reviewer` | Review code for quality/performance |
 | `unit-tester` | Write Vitest unit tests |
@@ -78,7 +79,17 @@ Custom agents in `.claude/agents/`:
 | `architecture-researcher` | Research technical approaches |
 | `legal-researcher` | Research compliance requirements |
 
-### Running Agents
+### Using the Orchestrator
+
+The orchestrator coordinates agents for you. Use it for:
+
+```
+Use orchestrator to add [new feature]     # Full workflow: research → plan → build → review → test
+Use orchestrator to continue the plan     # Resume existing implementation
+Use orchestrator to review and test       # Just verification steps
+```
+
+### Running Individual Agents
 
 ```
 Use cat-builder to create sprites from this image
@@ -88,7 +99,9 @@ Use implementer to add [feature]
 Use implementation-planner to plan [feature]
 ```
 
-### Full Workflow
+### Manual Workflow
+
+If you prefer to run agents individually:
 
 ```
 1. Research: Use architecture-researcher to research [feature]
