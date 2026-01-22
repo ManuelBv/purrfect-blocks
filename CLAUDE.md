@@ -70,6 +70,7 @@ Custom agents in `.claude/agents/`:
 
 | Agent | Purpose |
 |-------|---------|
+| `cat-builder` | Convert pixel art to sprite matrices for cats |
 | `code-reviewer` | Review code for quality/performance |
 | `unit-tester` | Write Vitest unit tests |
 | `implementer` | Implement features following patterns |
@@ -80,6 +81,7 @@ Custom agents in `.claude/agents/`:
 ### Running Agents
 
 ```
+Use cat-builder to create sprites from this image
 Use code-reviewer to review my recent changes
 Use unit-tester to write tests for ScoreManager
 Use implementer to add [feature]
@@ -96,6 +98,22 @@ Use implementation-planner to plan [feature]
 5. Test: Use unit-tester to write tests
 ```
 
+## Skills
+
+Custom skills in `.claude/skills/`:
+
+| Skill | Purpose |
+|-------|---------|
+| `/build-cats` | Convert pixel art images to sprite matrices |
+
+### Using Skills
+
+```
+/build-cats [path-to-image]
+```
+
+The cat-builder agent uses this skill internally to process screenshots.
+
 ## Key Files
 
 | File | Purpose |
@@ -103,4 +121,6 @@ Use implementation-planner to plan [feature]
 | `src/game/GamePhase2.ts` | Main game controller |
 | `src/game/GameBoard.ts` | Grid state and placement |
 | `src/game/CascadeEngine.ts` | Line clearing and combos |
+| `src/rendering/CatRenderer.ts` | Cat sprite matrices and rendering |
+| `src/entities/Cat.ts` | Cat entity with animation states |
 | `src/utils/constants.ts` | Configuration values |
