@@ -1,0 +1,106 @@
+# Purrfect Blocks 🐱☕
+
+A cozy block puzzle web game (like 1010!/Block Blast, NOT Tetris) with coffee shop aesthetic and interactive cats.
+
+## Tech Stack
+
+- TypeScript (strict mode), Vite, HTML5 Canvas 2D, Web Audio API
+- IndexedDB with localStorage fallback
+- Vitest (unit) + Playwright (E2E)
+- GitHub Pages deployment
+
+## Code Conventions
+
+- **Classes:** PascalCase (`GameBoard`, `PieceFactory`)
+- **Methods/Properties:** camelCase (`placePiece`, `cellSize`)
+- **Constants:** CONSTANT_CASE (`GRID_WIDTH`, `BASE_SCORE`)
+- **Private fields:** underscore prefix (`_occupied`, `_score`)
+- **Interfaces:** in `src/types/`
+
+## Architecture
+
+```
+src/
+├── audio/      # AudioEngine, SoundEffects
+├── board/      # Cell, CollisionDetector, GridManager
+├── entities/   # Cat companion system
+├── game/       # GamePhase2, GameBoard, CascadeEngine, LineDetector, PieceManager, ScoreManager
+├── input/      # DragHandler, GhostPreview, InputManager
+├── pieces/     # Piece, BombPiece, PieceFactory, PieceDefinitions
+├── rendering/  # All Canvas renderers (BoardRenderer, PieceRenderer, etc.)
+├── storage/    # GameStorage (IndexedDB)
+├── types/      # GameTypes, PieceTypes, RenderTypes, StorageTypes
+├── utils/      # constants, Colors, CanvasUtils, ErrorHandler
+└── main.ts     # Entry point
+```
+
+## Design Patterns
+
+- **Manager Pattern:** ScoreManager, PieceManager, ClearAnimationManager
+- **Factory Pattern:** PieceFactory
+- **Renderer Pattern:** Separate renderers per visual layer
+- **Observer Pattern:** Game events → audio/cats reactions
+- **State Machine:** GameState, CatAnimationState
+
+## Game Mechanics
+
+- **Grid:** 12×18 cells, responsive sizing
+- **Pieces:** 22 types (16 tetrominoes + 4 squares + bombs)
+- **Scoring:** 100 points/line × cascade multiplier (1.5x per level)
+- **Bombs:** 1×1 yarn balls → 3×3 explosion (50 pts/block)
+
+## Performance
+
+- 60fps target (16ms frame budget)
+- Mobile: 2-4 particles/block, Desktop: 4-8 particles/block
+- Autosave debounced 300ms
+
+## Commands
+
+```bash
+npm run dev      # Dev server
+npm run build    # Production build
+npm test         # Unit tests
+npm run deploy   # Deploy to GitHub Pages
+```
+
+## Agents
+
+Custom agents in `.claude/agents/`:
+
+| Agent | Purpose |
+|-------|---------|
+| `code-reviewer` | Review code for quality/performance |
+| `unit-tester` | Write Vitest unit tests |
+| `implementer` | Implement features following patterns |
+| `implementation-planner` | Create detailed implementation plans |
+| `architecture-researcher` | Research technical approaches |
+| `legal-researcher` | Research compliance requirements |
+
+### Running Agents
+
+```
+Use code-reviewer to review my recent changes
+Use unit-tester to write tests for ScoreManager
+Use implementer to add [feature]
+Use implementation-planner to plan [feature]
+```
+
+### Full Workflow
+
+```
+1. Research: Use architecture-researcher to research [feature]
+2. Plan: Use implementation-planner to create a plan
+3. Build: Use implementer to work on Phase 1
+4. Review: Use code-reviewer to review changes
+5. Test: Use unit-tester to write tests
+```
+
+## Key Files
+
+| File | Purpose |
+|------|---------|
+| `src/game/GamePhase2.ts` | Main game controller |
+| `src/game/GameBoard.ts` | Grid state and placement |
+| `src/game/CascadeEngine.ts` | Line clearing and combos |
+| `src/utils/constants.ts` | Configuration values |
