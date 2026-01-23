@@ -35,6 +35,7 @@ async function initializePlayerSettings() {
 
   updateSettingsUI();
   updateGreeting();
+  updateDevToolsVisibility();
 }
 
 function updateSettingsUI() {
@@ -43,6 +44,7 @@ function updateSettingsUI() {
   const volumeSlider = document.getElementById('volume-slider') as HTMLInputElement;
   const volumeValue = document.getElementById('volume-value');
   const muteToggle = document.getElementById('mute-toggle');
+  const devModeCheckbox = document.getElementById('dev-mode-checkbox') as HTMLInputElement;
 
   if (playerNameInput) {
     playerNameInput.value = currentPlayerSettings.name;
@@ -58,6 +60,20 @@ function updateSettingsUI() {
   if (muteToggle) {
     const isMuted = currentPlayerSettings.muted || false;
     muteToggle.textContent = isMuted ? '🔇' : '🔊';
+  }
+  if (devModeCheckbox) {
+    devModeCheckbox.checked = currentPlayerSettings.devMode || false;
+  }
+}
+
+function updateDevToolsVisibility() {
+  const devToolsArea = document.getElementById('dev-tools-area');
+  if (devToolsArea) {
+    if (currentPlayerSettings.devMode) {
+      devToolsArea.classList.remove('hidden');
+    } else {
+      devToolsArea.classList.add('hidden');
+    }
   }
 }
 
@@ -171,19 +187,23 @@ async function init() {
       const playerNameInput = document.getElementById('player-name-input') as HTMLInputElement;
       const volumeSlider = document.getElementById('volume-slider') as HTMLInputElement;
       const muteToggle = document.getElementById('mute-toggle');
+      const devModeCheckbox = document.getElementById('dev-mode-checkbox') as HTMLInputElement;
 
       const newName = playerNameInput.value.trim() || 'Player';
       const newVolume = volumeSlider ? parseInt(volumeSlider.value) : 70;
       const isMuted = muteToggle?.textContent === '🔇';
+      const devMode = devModeCheckbox?.checked || false;
 
       // Update settings - UUID is read-only and cannot be changed
       currentPlayerSettings.name = newName;
       currentPlayerSettings.volume = newVolume;
       currentPlayerSettings.muted = isMuted;
+      currentPlayerSettings.devMode = devMode;
 
       await playerSettingsManager.savePlayerSettings(currentPlayerSettings);
 
       updateGreeting();
+      updateDevToolsVisibility();
 
       if (settingsModal) {
         settingsModal.classList.add('hidden');
@@ -277,7 +297,7 @@ function initCatTester() {
   // State/sprite select
   if (stateSelect) {
     stateSelect.addEventListener('change', () => {
-      catTester.setSprite(stateSelect.value as 'sitting' | 'sitting2' | 'standing' | 'lying' | 'sittingFull');
+      catTester.setSprite(stateSelect.value as 'sitting' | 'sitting2' | 'standing' | 'lying' | 'sittingFull' | 'sittingFullClean' | 'sittingHalf');
       catTester.render();
       updateInfo();
     });

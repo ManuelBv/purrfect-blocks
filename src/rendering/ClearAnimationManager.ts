@@ -1,5 +1,7 @@
 // Manages staggered block clearing animations
 
+import { ParticleSystem } from './ParticleSystem';
+
 export interface BlockClearAnimation {
   row: number;
   col: number;
@@ -12,6 +14,13 @@ export class ClearAnimationManager {
   private animations: BlockClearAnimation[] = [];
   private animationDuration = 250; // ms per block
   private staggerDelay = 60; // ms delay between blocks in a line
+  private particleSystem: ParticleSystem;
+  private cellSize: number;
+
+  constructor(cellSize: number, isMobile: boolean = false) {
+    this.cellSize = cellSize;
+    this.particleSystem = new ParticleSystem(isMobile);
+  }
 
   /**
    * Schedule clearing animations for rows and columns
@@ -70,7 +79,7 @@ export class ClearAnimationManager {
       }
     });
 
-    // Convert to animations
+    // Convert to animations and spawn particles
     clearMap.forEach(({ row, col, delay, color }) => {
       this.animations.push({
         row,
@@ -79,6 +88,13 @@ export class ClearAnimationManager {
         duration: this.animationDuration,
         color
       });
+
+      // Spawn particles at block position (delayed to match animation start)
+      setTimeout(() => {
+        const x = col * this.cellSize;
+        const y = row * this.cellSize;
+        this.particleSystem.spawnParticles(x, y, this.cellSize, color);
+      }, delay);
     });
 
     console.log('Created', this.animations.length, 'animations');
@@ -162,7 +178,7 @@ export class ClearAnimationManager {
       }
     }
 
-    // Create animations with stagger based on distance from center
+    // Create animations with stagger based on distance from center and spawn particles
     blocks.forEach(({ row, col, distance, color }) => {
       const delay = distance * this.staggerDelay;
       this.animations.push({
@@ -172,6 +188,13 @@ export class ClearAnimationManager {
         duration: this.animationDuration,
         color
       });
+
+      // Spawn particles for explosion
+      setTimeout(() => {
+        const x = col * this.cellSize;
+        const y = row * this.cellSize;
+        this.particleSystem.spawnParticles(x, y, this.cellSize, color);
+      }, delay);
     });
 
     console.log('Created', this.animations.length, 'explosion animations');
@@ -179,5 +202,27 @@ export class ClearAnimationManager {
 
   clear(): void {
     this.animations = [];
+    this.particleSystem.clear();
+  }
+
+  /**
+   * Update particle physics
+   */
+  updateParticles(deltaTime: number): void {
+    this.particleSystem.update(deltaTime);
+  }
+
+  /**
+   * Get particle system for rendering
+   */
+  getParticleSystem(): ParticleSystem {
+    return this.particleSystem;
+  }
+
+  /**
+   * Update cell size for responsive layouts
+   */
+  updateCellSize(cellSize: number): void {
+    this.cellSize = cellSize;
   }
 }

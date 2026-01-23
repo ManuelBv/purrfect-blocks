@@ -664,6 +664,78 @@ button:active {
   font-family: 'Courier New', monospace;
 }
 
+/* Dev Tools Area */
+.dev-tools-area {
+  margin-top: 30px;
+  padding: 20px;
+  background: rgba(62, 39, 35, 0.2);
+  border-radius: 15px;
+  border: 2px dashed var(--color-caramel);
+}
+
+.dev-tools-area.hidden {
+  display: none;
+}
+
+/* Extra Details Panel (in dev tools area) */
+.extra-details-panel {
+  margin-top: 20px;
+  padding: 20px;
+  background: rgba(62, 39, 35, 0.3);
+  border-radius: 10px;
+  text-align: center;
+}
+
+.extra-details-panel h3 {
+  color: var(--color-cream);
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+.extra-details-panel .uuid-section {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.extra-details-panel .uuid-subtitle {
+  font-size: 0.8rem;
+  color: var(--color-caramel);
+  margin-bottom: 8px;
+}
+
+.extra-details-panel .uuid-value {
+  font-family: 'Courier New', monospace;
+  font-size: 0.85rem;
+  color: var(--color-cream);
+  word-break: break-all;
+}
+
+/* Dev Mode Checkbox */
+.dev-mode-control {
+  margin-top: 10px;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  font-weight: normal !important;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--color-burnt-orange);
+}
+
+.checkbox-label span {
+  font-size: 1rem;
+  color: var(--color-mocha);
+}
+
 /* Mobile responsiveness */
 @media (max-width: 768px) {
   .game-header {

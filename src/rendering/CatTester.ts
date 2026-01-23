@@ -2,6 +2,7 @@
 
 import type { CatType } from '../entities/Cat';
 import { sittingCatFullSprite } from './sprites/SittingCatFullSprite';
+import { sittingCatHalfSprite, sittingCatFullCleanedSprite } from './sprites/SittingCatHalfSprite';
 
 // Color indices for sprite matrices
 // 0 = transparent
@@ -14,7 +15,7 @@ import { sittingCatFullSprite } from './sprites/SittingCatFullSprite';
 // 7 = eye dark
 // 8 = eye highlight
 
-type SpriteType = 'sitting' | 'sitting2' | 'standing' | 'lying' | 'sittingFull';
+type SpriteType = 'sitting' | 'sitting2' | 'standing' | 'lying' | 'sittingFull' | 'sittingFullClean' | 'sittingHalf';
 
 export class CatTester {
   private canvas: HTMLCanvasElement;
@@ -177,6 +178,10 @@ export class CatTester {
         return this.lyingSprite;
       case 'sittingFull':
         return sittingCatFullSprite;
+      case 'sittingFullClean':
+        return sittingCatFullCleanedSprite;
+      case 'sittingHalf':
+        return sittingCatHalfSprite;
       default:
         return this.sittingSprite;
     }
@@ -193,6 +198,8 @@ export class CatTester {
       standing: 'standingSprite',
       lying: 'lyingSprite',
       sittingFull: 'sittingCatFullSprite (123x124)',
+      sittingFullClean: 'sittingCatFullCleanedSprite (123x124 cleaned)',
+      sittingHalf: 'sittingCatHalfSprite (62x62)',
     };
 
     return {

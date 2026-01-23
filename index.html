@@ -51,60 +51,75 @@
       <p class="phase-info">Phase 2: Complete - IndexedDB Persistence & Settings</p>
     </div>
 
-    <!-- Audio Test Buttons -->
-    <div class="audio-test-panel">
-      <h3>Audio Test</h3>
-      <div class="audio-test-buttons">
-        <button id="test-piece-placed">Piece Placed</button>
-        <button id="test-line-clear">Line Clear</button>
-        <button id="test-bomb-explosion">Bomb Explosion</button>
-        <button id="test-cascade-2x">Cascade 2x</button>
-        <button id="test-cascade-3x">Cascade 3x</button>
-        <button id="test-cascade-4x">Cascade 4x</button>
-        <button id="test-game-over">Game Over</button>
-        <button id="test-success">Success</button>
-        <button id="test-invalid">Invalid</button>
+    <!-- Dev Tools Area (hidden by default, shown when dev mode enabled) -->
+    <div id="dev-tools-area" class="dev-tools-area hidden">
+      <!-- Audio Test Buttons -->
+      <div class="audio-test-panel">
+        <h3>Audio Test</h3>
+        <div class="audio-test-buttons">
+          <button id="test-piece-placed">Piece Placed</button>
+          <button id="test-line-clear">Line Clear</button>
+          <button id="test-bomb-explosion">Bomb Explosion</button>
+          <button id="test-cascade-2x">Cascade 2x</button>
+          <button id="test-cascade-3x">Cascade 3x</button>
+          <button id="test-cascade-4x">Cascade 4x</button>
+          <button id="test-game-over">Game Over</button>
+          <button id="test-success">Success</button>
+          <button id="test-invalid">Invalid</button>
+        </div>
       </div>
-    </div>
 
-    <!-- Cat Sprite Tester -->
-    <div class="cat-test-panel">
-      <h3>Cat Sprite Tester 🐱</h3>
-      <div class="cat-test-controls">
-        <div class="cat-test-row">
-          <label for="cat-type-select">Cat Type:</label>
-          <select id="cat-type-select">
-            <option value="ORANGE_TABBY">Orange Tabby</option>
-            <option value="WHITE_LONGHAIR">White Longhair</option>
-          </select>
+      <!-- Cat Sprite Tester -->
+      <div class="cat-test-panel">
+        <h3>Cat Sprite Tester 🐱</h3>
+        <div class="cat-test-controls">
+          <div class="cat-test-row">
+            <label for="cat-type-select">Cat Type:</label>
+            <select id="cat-type-select">
+              <option value="ORANGE_TABBY">Orange Tabby</option>
+              <option value="WHITE_LONGHAIR">White Longhair</option>
+            </select>
+          </div>
+          <div class="cat-test-row">
+            <label for="cat-state-select">Sprite:</label>
+            <select id="cat-state-select">
+              <option value="sitting">Sitting (19x21)</option>
+              <option value="sitting2">Sitting v2 (18x17)</option>
+              <option value="standing">Standing (24x19)</option>
+              <option value="lying">Lying (24x14)</option>
+              <option value="sittingFull">Full Resolution (123x124)</option>
+              <option value="sittingFullClean">Full Cleaned (123x124)</option>
+              <option value="sittingHalf">Half Resolution (62x62)</option>
+            </select>
+          </div>
+          <div class="cat-test-row">
+            <label for="cat-scale-slider">Scale:</label>
+            <input type="range" id="cat-scale-slider" min="1" max="8" value="4">
+            <span id="cat-scale-value">4x</span>
+          </div>
+          <div class="cat-test-buttons">
+            <button id="cat-test-render">Render Cat</button>
+            <button id="cat-test-flip">Flip Horizontal</button>
+            <button id="cat-test-clear">Clear</button>
+          </div>
         </div>
-        <div class="cat-test-row">
-          <label for="cat-state-select">Sprite:</label>
-          <select id="cat-state-select">
-            <option value="sitting">Sitting (19x21)</option>
-            <option value="sitting2">Sitting v2 (18x17)</option>
-            <option value="standing">Standing (24x19)</option>
-            <option value="lying">Lying (24x14)</option>
-            <option value="sittingFull">Full Resolution (123x124)</option>
-          </select>
+        <div class="cat-test-canvas-wrapper">
+          <canvas id="cat-test-canvas" width="200" height="200"></canvas>
         </div>
-        <div class="cat-test-row">
-          <label for="cat-scale-slider">Scale:</label>
-          <input type="range" id="cat-scale-slider" min="1" max="8" value="4">
-          <span id="cat-scale-value">4x</span>
-        </div>
-        <div class="cat-test-buttons">
-          <button id="cat-test-render">Render Cat</button>
-          <button id="cat-test-flip">Flip Horizontal</button>
-          <button id="cat-test-clear">Clear</button>
+        <div class="cat-test-info">
+          <p>Sprite: <span id="cat-sprite-info">-</span></p>
+          <p>Dimensions: <span id="cat-dimensions-info">-</span></p>
         </div>
       </div>
-      <div class="cat-test-canvas-wrapper">
-        <canvas id="cat-test-canvas" width="200" height="200"></canvas>
-      </div>
-      <div class="cat-test-info">
-        <p>Sprite: <span id="cat-sprite-info">-</span></p>
-        <p>Dimensions: <span id="cat-dimensions-info">-</span></p>
+
+      <!-- Extra Details (moved from settings modal) -->
+      <div class="extra-details-panel">
+        <h3>Extra Details</h3>
+        <div class="setting-item uuid-section">
+          <label>Your Unique ID</label>
+          <div class="uuid-subtitle">Cannot be edited</div>
+          <div class="uuid-value" id="player-uuid">-</div>
+        </div>
       </div>
     </div>
 
@@ -139,17 +154,14 @@
               <button id="mute-toggle" class="mute-btn">🔊</button>
             </div>
           </div>
+          <div class="setting-item dev-mode-control">
+            <label for="dev-mode-checkbox" class="checkbox-label">
+              <input type="checkbox" id="dev-mode-checkbox">
+              <span>Enable Dev Mode</span>
+            </label>
+          </div>
         </div>
         <button id="save-settings-btn" class="save-settings-btn">Save Settings</button>
-
-        <details class="extra-details">
-          <summary>Extra details</summary>
-          <div class="setting-item uuid-section">
-            <label>Your Unique ID</label>
-            <div class="uuid-subtitle">Cannot be edited</div>
-            <div class="uuid-value" id="player-uuid">-</div>
-          </div>
-        </details>
       </div>
     </div>
   </div>

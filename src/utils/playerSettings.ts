@@ -8,6 +8,7 @@ export interface PlayerSettings {
   uuid: string;
   volume?: number; // 0-100
   muted?: boolean;
+  devMode?: boolean; // Show dev tools (audio test, sprite tester, extra details)
 }
 
 export class PlayerSettingsManager {

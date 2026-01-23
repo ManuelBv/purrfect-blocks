@@ -41,3 +41,15 @@ export interface CatState {
   state: 'IDLE' | 'SWAT' | 'PURR' | 'EXCITED';
   animationFrame: number;
 }
+
+export interface Particle {
+  x: number;
+  y: number;
+  vx: number; // velocity x
+  vy: number; // velocity y
+  life: number; // 0-1, decays over time
+  maxLife: number; // total lifetime in ms
+  color: string;
+  size: number;
+  birthTime: number;
+}

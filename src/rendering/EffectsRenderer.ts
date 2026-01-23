@@ -1,6 +1,6 @@
 // Visual effects for line clears and animations
 
-import type { VisualEffect } from '../types/RenderTypes';
+import type { VisualEffect, Particle } from '../types/RenderTypes';
 import { UI_COLORS } from '../utils/Colors';
 
 export class EffectsRenderer {
@@ -16,9 +16,10 @@ export class EffectsRenderer {
     this.cellSize = cellSize;
   }
 
-  render(effects: VisualEffect[]): void {
+  render(effects: VisualEffect[], particles: Particle[] = []): void {
     this.clear();
 
+    // Render visual effects
     for (const effect of effects) {
       switch (effect.type) {
         case 'CLEAR_LINE':
@@ -32,6 +33,9 @@ export class EffectsRenderer {
           break;
       }
     }
+
+    // Render particles
+    this.renderParticles(particles);
   }
 
   private clear(): void {
@@ -95,6 +99,34 @@ export class EffectsRenderer {
     this.ctx.globalAlpha = 0.3 * (1 - effect.progress);
     this.ctx.fillStyle = effect.color;
     this.ctx.fillRect(x, y - this.cellSize * effect.progress, this.cellSize, this.cellSize * effect.progress);
+    this.ctx.restore();
+  }
+
+  private renderParticles(particles: Particle[]): void {
+    this.ctx.save();
+
+    for (const particle of particles) {
+      // Fade out as particle dies
+      this.ctx.globalAlpha = particle.life;
+
+      // Draw spark particle
+      this.ctx.fillStyle = particle.color;
+      this.ctx.beginPath();
+      this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+      this.ctx.fill();
+
+      // Add slight glow for spark effect
+      if (particle.life > 0.5) {
+        this.ctx.globalAlpha = particle.life * 0.5;
+        this.ctx.shadowBlur = 4;
+        this.ctx.shadowColor = particle.color;
+        this.ctx.beginPath();
+        this.ctx.arc(particle.x, particle.y, particle.size * 1.5, 0, Math.PI * 2);
+        this.ctx.fill();
+        this.ctx.shadowBlur = 0;
+      }
+    }
+
     this.ctx.restore();
   }
 

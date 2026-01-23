@@ -22,6 +22,8 @@ import { GameStorage } from '../storage/GameStorage';
 import { AudioEngine } from '../audio/AudioEngine';
 import { SoundEffects } from '../audio/SoundEffects';
 import { getRandomBombMessage } from '../utils/kittenMessages';
+import { Cat } from '../entities/Cat';
+import { CatRenderer } from '../rendering/CatRenderer';
 
 export class Game {
   private board: GameBoard;
@@ -48,10 +50,14 @@ export class Game {
   private audioEngine: AudioEngine;
   private soundEffects: SoundEffects;
 
+  private cats: Cat[] = [];
+  private catRenderer: CatRenderer | null = null;
+
   constructor(
     boardCanvas: HTMLCanvasElement,
     panelCanvas: HTMLCanvasElement,
-    effectsCanvas: HTMLCanvasElement
+    effectsCanvas: HTMLCanvasElement,
+    catsCanvas?: HTMLCanvasElement
   ) {
     this.board = new GameBoard();
     this.scoreManager = new ScoreManager();
@@ -65,10 +71,18 @@ export class Game {
     this.panelRenderer = new PanelRenderer(panelCanvas, cellSize);
     this.effectsRenderer = new EffectsRenderer(effectsCanvas, cellSize);
     this.hudRenderer = new HUDRenderer();
-    this.clearAnimationManager = new ClearAnimationManager();
+
+    // Detect mobile for particle optimization
+    const isMobile = window.innerWidth < 768;
+    this.clearAnimationManager = new ClearAnimationManager(cellSize, isMobile);
 
     // Setup effects canvas to cover entire game area
     this.setupEffectsCanvas(effectsCanvas);
+
+    // Setup cats
+    if (catsCanvas) {
+      this.setupCats(catsCanvas, boardCanvas, cellSize);
+    }
 
     // Setup input
     this.inputManager = new InputManager(boardCanvas, cellSize);
@@ -121,6 +135,66 @@ export class Game {
     canvas.style.height = `${rect.height}px`;
   }
 
+  private setupCats(catsCanvas: HTMLCanvasElement, boardCanvas: HTMLCanvasElement, cellSize: number): void {
+    const gameArea = document.querySelector('.game-area') as HTMLElement;
+    if (!gameArea) return;
+
+    // Get board position within game area
+    const gameAreaRect = gameArea.getBoundingClientRect();
+    const boardRect = boardCanvas.getBoundingClientRect();
+
+    // Calculate board offset from game area
+    const boardOffsetX = boardRect.left - gameAreaRect.left;
+    const boardOffsetY = boardRect.top - gameAreaRect.top;
+
+    // Size cats canvas to cover entire window (wider than game area to show cats on sides)
+    const catSize = cellSize * 8;
+    const extraWidth = catSize * 2 + cellSize * 2; // Space for both cats plus margins
+
+    catsCanvas.width = gameAreaRect.width + extraWidth;
+    catsCanvas.height = gameAreaRect.height;
+    catsCanvas.style.width = `${gameAreaRect.width + extraWidth}px`;
+    catsCanvas.style.height = `${gameAreaRect.height}px`;
+
+    // Position canvas to extend beyond game area
+    catsCanvas.style.left = `-${catSize + cellSize}px`;
+    catsCanvas.style.position = 'absolute';
+
+    // Initialize cat renderer
+    this.catRenderer = new CatRenderer(catsCanvas);
+
+    // Get board dimensions
+    const boardWidth = boardCanvas.width;
+    const boardHeight = boardCanvas.height;
+
+    // Adjust for canvas offset - cats need to know where board is within the expanded canvas
+    const boardXInCanvas = catSize + cellSize + boardOffsetX;
+
+    // Create two cats - one on each side
+    this.cats.push(new Cat({
+      type: 'WHITE_LONGHAIR',
+      side: 'LEFT',
+      boardHeight,
+      boardWidth,
+      cellSize,
+      boardOffsetX: boardXInCanvas,
+      boardOffsetY: boardOffsetY
+    }));
+
+    this.cats.push(new Cat({
+      type: 'ORANGE_TABBY',
+      side: 'RIGHT',
+      boardHeight,
+      boardWidth,
+      cellSize,
+      boardOffsetX: boardXInCanvas,
+      boardOffsetY: boardOffsetY
+    }));
+
+    console.log('Cats initialized:', this.cats.length, 'Canvas size:', catsCanvas.width, 'x', catsCanvas.height);
+    console.log('Board offset in canvas:', boardXInCanvas, boardOffsetY);
+  }
+
   private async init(): Promise<void> {
     console.log('Game init starting...');
 
@@ -162,6 +236,9 @@ export class Game {
     }
 
     this.gameState = GameState.PLAYING;
+
+    // Cats react to game start
+    this.triggerCatReaction('GAME_START');
 
     // Debug: Check if pieces exist
     const pieces = this.pieceManager.getAvailablePieces();
@@ -225,8 +302,14 @@ export class Game {
       this.pieceManager.getSelectedIndex()
     );
 
-    // Render effects
-    this.effectsRenderer.render(this.effects);
+    // Render effects and particles
+    const particles = this.clearAnimationManager.getParticleSystem().getParticles();
+    this.effectsRenderer.render(this.effects, particles);
+
+    // Render cats
+    if (this.catRenderer && this.cats.length > 0) {
+      this.catRenderer.render(this.cats);
+    }
 
     // Render dragging piece with ghost preview
     this.renderDraggedPiece();
@@ -443,6 +526,9 @@ export class Game {
     // Play bomb explosion sound (cat hiss and claw) at the start of the animation
     this.soundEffects.playBombExplosion();
 
+    // Cats react to bomb!
+    this.triggerCatReaction('BOMB');
+
     // Wait for animation to complete
     const animDuration = this.clearAnimationManager.getTotalDuration();
     console.log('Explosion animation duration:', animDuration, 'ms');
@@ -498,6 +584,10 @@ export class Game {
 
       // Play line clear sound at the start of the animation
       this.soundEffects.playLineClear();
+
+      // Cats react to line clear or combo
+      const currentCombo = this.scoreManager.getComboMultiplier();
+      this.triggerCatReaction(currentCombo > 1.5 ? 'COMBO' : 'LINE_CLEAR');
 
       // Schedule the clear animation
       this.clearAnimationManager.scheduleClearing(lines.rows, lines.cols, this.board);
@@ -557,6 +647,20 @@ export class Game {
       effect.progress += deltaTime / 1000; // Convert to seconds
       return effect.progress < 1.0; // Remove completed effects
     });
+
+    // Update particle physics
+    this.clearAnimationManager.updateParticles(deltaTime);
+
+    // Update cats
+    for (const cat of this.cats) {
+      cat.update(deltaTime);
+    }
+  }
+
+  private triggerCatReaction(event: 'GAME_START' | 'LINE_CLEAR' | 'COMBO' | 'BOMB' | 'GAME_OVER'): void {
+    for (const cat of this.cats) {
+      cat.react(event);
+    }
   }
 
   private delay(ms: number): Promise<void> {
@@ -569,6 +673,9 @@ export class Game {
 
     // Play game over sound
     this.soundEffects.playGameOver();
+
+    // Cats react to game over
+    this.triggerCatReaction('GAME_OVER');
 
     const finalScore = this.scoreManager.getScore();
 
