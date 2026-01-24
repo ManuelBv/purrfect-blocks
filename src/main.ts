@@ -9,6 +9,7 @@ import './styles/main.css';
 
 let playerSettingsManager: PlayerSettingsManager;
 let currentPlayerSettings: PlayerSettings;
+let game: Game | null = null;
 
 async function initializePlayerSettings() {
   playerSettingsManager = new PlayerSettingsManager();
@@ -97,13 +98,13 @@ async function init() {
     throw new Error('Canvas elements not found');
   }
 
-  const game = new Game(boardCanvas, panelCanvas, effectsCanvas, catsCanvas);
+  game = new Game(boardCanvas, panelCanvas, effectsCanvas, catsCanvas);
 
   // Setup restart button
   const restartBtn = document.getElementById('restart-btn');
   if (restartBtn) {
     restartBtn.addEventListener('click', () => {
-      game.restart();
+      game!.restart();
     });
   }
 
@@ -152,8 +153,8 @@ async function init() {
     // Also reset audio engine to saved values
     const savedVolume = currentPlayerSettings.volume || 70;
     const savedMuted = currentPlayerSettings.muted || false;
-    game.getAudioEngine().setVolume(savedVolume / 100);
-    game.getAudioEngine().setMuted(savedMuted);
+    game!.getAudioEngine().setVolume(savedVolume / 100);
+    game!.getAudioEngine().setMuted(savedMuted);
 
     if (settingsModal) {
       settingsModal.classList.add('hidden');
@@ -225,7 +226,7 @@ async function init() {
     volumeSlider.addEventListener('input', () => {
       const volume = parseInt(volumeSlider.value);
       volumeValue.textContent = `${volume}%`;
-      game.getAudioEngine().setVolume(volume / 100);
+      game!.getAudioEngine().setVolume(volume / 100);
     });
   }
 
@@ -241,13 +242,16 @@ async function init() {
     muteToggle.addEventListener('click', () => {
       const currentlyMuted = muteToggle.textContent === '🔇';
       const newMutedState = !currentlyMuted;
-      game.getAudioEngine().setMuted(newMutedState);
+      game!.getAudioEngine().setMuted(newMutedState);
       muteToggle.textContent = newMutedState ? '🔇' : '🔊';
     });
   }
 
   // Initialize Cat Tester
   initCatTester();
+
+  // Initialize Performance Monitor
+  initPerformanceMonitor();
 
   console.log('Purrfect Blocks Phase 2 initialized! 🐱☕ Drag pieces from panel to board!');
 }
@@ -329,6 +333,56 @@ function initCatTester() {
   // Initial render
   catTester.render();
   updateInfo();
+}
+
+function initPerformanceMonitor() {
+  // Update performance stats every second (only in dev mode)
+  const updatePerformanceStats = () => {
+    const hitRateEl = document.getElementById('cache-hit-rate');
+    const cacheSizeEl = document.getElementById('cache-size');
+    const cacheMemoryEl = document.getElementById('cache-memory');
+    const cacheHitsEl = document.getElementById('cache-hits');
+    const cacheMissesEl = document.getElementById('cache-misses');
+
+    if (!game || !hitRateEl) return;
+
+    const stats = game.getCacheStats();
+    const hitRate = game.getCacheHitRate();
+
+    if (stats && hitRateEl && cacheSizeEl && cacheMemoryEl && cacheHitsEl && cacheMissesEl) {
+      hitRateEl.textContent = `${hitRate.toFixed(1)}%`;
+      cacheSizeEl.textContent = `${stats.size} sprites`;
+
+      const kb = stats.memoryUsageBytes / 1024;
+      if (kb < 1024) {
+        cacheMemoryEl.textContent = `${kb.toFixed(1)} KB`;
+      } else {
+        const mb = kb / 1024;
+        cacheMemoryEl.textContent = `${mb.toFixed(1)} MB`;
+      }
+
+      cacheHitsEl.textContent = stats.hits.toString();
+      cacheMissesEl.textContent = stats.misses.toString();
+    } else if (hitRateEl && cacheSizeEl && cacheMemoryEl && cacheHitsEl && cacheMissesEl) {
+      hitRateEl.textContent = 'N/A';
+      cacheSizeEl.textContent = 'N/A';
+      cacheMemoryEl.textContent = 'N/A';
+      cacheHitsEl.textContent = 'N/A';
+      cacheMissesEl.textContent = 'N/A';
+    }
+  };
+
+  // Update stats every second
+  setInterval(updatePerformanceStats, 1000);
+
+  // Clear cache button
+  const clearCacheBtn = document.getElementById('clear-sprite-cache');
+  if (clearCacheBtn && game) {
+    clearCacheBtn.addEventListener('click', () => {
+      game!.clearSpriteCache();
+      updatePerformanceStats(); // Update display immediately
+    });
+  }
 }
 
 // Initialize when DOM is ready

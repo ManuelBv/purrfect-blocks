@@ -677,6 +677,64 @@ button:active {
   display: none;
 }
 
+/* Performance Monitor Panel */
+.performance-monitor-panel {
+  margin-top: 20px;
+  padding: 20px;
+  background: rgba(62, 39, 35, 0.3);
+  border-radius: 10px;
+  max-width: 400px;
+}
+
+.performance-monitor-panel h3 {
+  color: var(--color-cream);
+  margin-bottom: 15px;
+  font-size: 1.2rem;
+}
+
+.performance-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 15px;
+}
+
+.performance-stats .stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 5px;
+}
+
+.performance-stats .stat-row label {
+  color: var(--color-latte);
+  font-size: 0.9rem;
+}
+
+.performance-stats .stat-row span {
+  color: var(--color-cream);
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+}
+
+.performance-monitor-panel button {
+  width: 100%;
+  padding: 10px;
+  background: var(--color-burnt-orange);
+  color: var(--color-cream);
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: background 0.3s;
+}
+
+.performance-monitor-panel button:hover {
+  background: #BF360C;
+}
+
 /* Extra Details Panel (in dev tools area) */
 .extra-details-panel {
   margin-top: 20px;

@@ -191,8 +191,6 @@ export class Game {
       boardOffsetY: boardOffsetY
     }));
 
-    console.log('Cats initialized:', this.cats.length, 'Canvas size:', catsCanvas.width, 'x', catsCanvas.height);
-    console.log('Board offset in canvas:', boardXInCanvas, boardOffsetY);
   }
 
   private async init(): Promise<void> {
@@ -837,5 +835,36 @@ export class Game {
 
   isPaused(): boolean {
     return this.gameState === GameState.PAUSED;
+  }
+
+  /**
+   * Get sprite cache statistics for performance monitoring
+   * Returns cache stats if catRenderer is initialized, null otherwise
+   */
+  getCacheStats() {
+    if (this.catRenderer) {
+      return this.catRenderer.getCacheStats();
+    }
+    return null;
+  }
+
+  /**
+   * Get sprite cache hit rate percentage
+   * Returns hit rate if catRenderer is initialized, 0 otherwise
+   */
+  getCacheHitRate(): number {
+    if (this.catRenderer) {
+      return this.catRenderer.getCacheHitRate();
+    }
+    return 0;
+  }
+
+  /**
+   * Clear sprite cache (useful for dev mode or after resize)
+   */
+  clearSpriteCache(): void {
+    if (this.catRenderer) {
+      this.catRenderer.clearCache();
+    }
   }
 }

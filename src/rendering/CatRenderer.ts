@@ -2,6 +2,7 @@
 
 import type { Cat, CatAnimationState, CatType } from '../entities/Cat';
 import { sittingCatFullSprite } from './sprites/SittingCatFullSprite';
+import { SpriteCache } from './SpriteCache';
 
 // Color indices for sprite matrices
 // 0 = transparent
@@ -16,6 +17,7 @@ import { sittingCatFullSprite } from './sprites/SittingCatFullSprite';
 
 export class CatRenderer {
   private ctx: CanvasRenderingContext2D;
+  private spriteCache: SpriteCache;
 
   // Sitting cat sprite - 19 wide x 21 tall (analyzed from reference)
   private sittingSprite: number[][] = [
@@ -115,6 +117,42 @@ export class CatRenderer {
     }
     this.ctx = context;
     this.ctx.imageSmoothingEnabled = false;
+    this.spriteCache = new SpriteCache();
+
+    // Pre-warm cache with common sprites on initialization
+    this.prewarmCache();
+  }
+
+  /**
+   * Pre-render common cat sprites to cache for optimal first-frame performance
+   * Caches both cat types in common states at typical sizes
+   */
+  private prewarmCache(): void {
+    const commonStates: CatAnimationState[] = ['SITTING', 'IDLE', 'EXCITED'];
+    const catTypes: CatType[] = ['ORANGE_TABBY', 'WHITE_LONGHAIR'];
+    const commonSizes = [120, 152, 180]; // Larger sizes for full-res sprites
+
+    for (const catType of catTypes) {
+      for (const state of commonStates) {
+        for (const size of commonSizes) {
+          const sprite = this.getSpriteForState(state);
+          const colors = this.getColorPalette(catType);
+          const cacheKey = this.spriteCache.getCacheKey(
+            catType,
+            state,
+            0, // Frame 0 (most common)
+            size,
+            colors
+          );
+
+          // Only pre-render if not already cached
+          if (!this.spriteCache.has(cacheKey)) {
+            const offscreenCanvas = this.renderSpriteToCanvas(sprite, size, colors, false, 0);
+            this.spriteCache.set(cacheKey, offscreenCanvas);
+          }
+        }
+      }
+    }
   }
 
   render(cats: Cat[]): void {
@@ -130,9 +168,33 @@ export class CatRenderer {
     const size = cat.getSize();
     const type = cat.getType();
     const state = cat.getState();
+    const frame = cat.getAnimationFrame();
+
+    // Note: Breathing offset disabled for full-res sprite (causes visual jumping)
+    // For proper breathing, would need to animate specific sprite rows, not translate entire sprite
+    // const breathingYOffset = cat.getBreathingYOffset();
+
+    // Apply state transition offset (for sit/stand transitions)
+    const transitionYOffset = cat.getTransitionYOffset();
+
+    // Combine offsets (breathing disabled for full-res sprite)
+    const totalYOffset = transitionYOffset;
+
+    // Note: Micro-animations (ear twitch, tail swish) disabled for performance
+    // The full-res 123x124 sprite would need to be re-rendered every frame
+    // which causes ~1.8M fillRect calls/second and 10%+ CPU usage
+
+    // Get sprite and colors
+    const sprite = this.getSpriteForState(state);
+    const colors = this.getColorPalette(type);
+
+    // ALWAYS use cache for performance - micro-animations disabled for full-res sprites
+    // The 123x124 sprite has 15,252 pixels - re-rendering every frame kills performance
+    // Micro-animations (ear twitch, tail swish) would need separate cached frames
+    const cacheKey = this.spriteCache.getCacheKey(type, state, frame, size, colors);
 
     this.ctx.save();
-    this.ctx.translate(x, y);
+    this.ctx.translate(x, y + totalYOffset);
 
     // Flip for right-side cats
     if (cat.getSide() === 'RIGHT') {
@@ -140,24 +202,42 @@ export class CatRenderer {
       this.ctx.translate(-size, 0);
     }
 
-    const colors = this.getColorPalette(type);
+    // Always use cache for performance
+    const cached = this.spriteCache.get(cacheKey);
 
-    // Choose sprite based on state
-    let sprite: number[][];
-    switch (state) {
-      case 'WALKING':
-        sprite = this.standingSprite;
-        break;
-      case 'GAME_OVER':
-        sprite = this.lyingSprite;
-        break;
-      default:
-        sprite = this.sittingSprite;
+    if (cached) {
+      // Cache hit: Fast blit of pre-rendered sprite (~10x faster)
+      this.ctx.drawImage(cached.canvas, 0, 0);
+    } else {
+      // Cache miss: Render to offscreen canvas, cache it, then blit
+      const offscreenCanvas = this.renderSpriteToCanvas(sprite, size, colors, false, 0);
+      this.spriteCache.set(cacheKey, offscreenCanvas);
+      this.ctx.drawImage(offscreenCanvas, 0, 0);
     }
 
-    this.drawSprite(sprite, size, colors);
-
     this.ctx.restore();
+  }
+
+  /**
+   * Get sprite matrix for a given animation state
+   * Uses the full-resolution 123x124 sprite for best quality
+   */
+  private getSpriteForState(state: CatAnimationState): number[][] {
+    // Use full-resolution sprite for all states (best quality)
+    // In the future, we can create full-res versions of standing/lying sprites
+    switch (state) {
+      case 'WALKING':
+      case 'STANDING':
+      case 'GAME_OVER':
+      case 'YAWNING':
+      case 'STRETCHING':
+      case 'SITTING':
+      case 'IDLE':
+      case 'EXCITED':
+      case 'SWAT':
+      default:
+        return sittingCatFullSprite;
+    }
   }
 
   private getColorPalette(type: CatType): string[] {
@@ -189,7 +269,79 @@ export class CatRenderer {
     }
   }
 
-  private drawSprite(sprite: number[][], size: number, colors: string[]): void {
+  /**
+   * Render sprite to offscreen canvas for caching
+   * Creates a new canvas with the sprite pre-rendered
+   *
+   * @param sprite - Sprite matrix to render
+   * @param size - Render size in pixels
+   * @param colors - Color palette for the sprite
+   * @param isEarTwitching - Whether ear twitch effect is active
+   * @param tailSwishOffset - Tail swish offset in pixels
+   * @returns Offscreen canvas with rendered sprite
+   */
+  private renderSpriteToCanvas(
+    sprite: number[][],
+    size: number,
+    colors: string[],
+    isEarTwitching: boolean,
+    tailSwishOffset: number
+  ): HTMLCanvasElement {
+    const canvas = document.createElement('canvas');
+    const spriteHeight = sprite.length;
+    const spriteWidth = sprite[0].length;
+    const ps = size / Math.max(spriteWidth, spriteHeight); // pixel size
+
+    canvas.width = Math.ceil(spriteWidth * ps);
+    canvas.height = Math.ceil(spriteHeight * ps);
+
+    const ctx = canvas.getContext('2d')!;
+    ctx.imageSmoothingEnabled = false;
+
+    // Render sprite to offscreen canvas
+    for (let y = 0; y < spriteHeight; y++) {
+      for (let x = 0; x < spriteWidth; x++) {
+        const colorIndex = sprite[y][x];
+        if (colorIndex === 0) continue; // transparent
+
+        let drawX = x;
+        let drawY = y;
+
+        // Apply ear twitch effect (shift ear pixels slightly)
+        if (isEarTwitching && y <= 2) {
+          if (colorIndex === 6) {
+            drawX += 0.3;
+          }
+        }
+
+        // Apply tail swish offset
+        if (tailSwishOffset !== 0 && x >= spriteWidth - 6) {
+          drawX += tailSwishOffset / ps;
+        }
+
+        ctx.fillStyle = colors[colorIndex];
+        ctx.fillRect(
+          Math.floor(drawX * ps),
+          Math.floor(drawY * ps),
+          Math.ceil(ps),
+          Math.ceil(ps)
+        );
+      }
+    }
+
+    return canvas;
+  }
+
+  /**
+   * Draw sprite directly to main canvas (used for dynamic micro-animations)
+   */
+  private drawSprite(
+    sprite: number[][],
+    size: number,
+    colors: string[],
+    isEarTwitching: boolean = false,
+    tailSwishOffset: number = 0
+  ): void {
     const spriteHeight = sprite.length;
     const spriteWidth = sprite[0].length;
     const ps = size / Math.max(spriteWidth, spriteHeight); // pixel size
@@ -199,14 +351,56 @@ export class CatRenderer {
         const colorIndex = sprite[y][x];
         if (colorIndex === 0) continue; // transparent
 
+        let drawX = x;
+        let drawY = y;
+
+        // Apply ear twitch effect (shift ear pixels slightly)
+        // Ears are typically in rows 0-2 for most sprites
+        if (isEarTwitching && y <= 2) {
+          // Pink ear pixels (color index 6) move slightly
+          if (colorIndex === 6) {
+            drawX += 0.3; // Slight horizontal shift during twitch
+          }
+        }
+
+        // Apply tail swish offset
+        // Tail is typically on the right side or specific columns depending on sprite
+        // For sitting sprite, tail is around column 16-18
+        // For standing sprite, tail is around columns 18-23
+        if (tailSwishOffset !== 0 && x >= spriteWidth - 6) {
+          // Apply horizontal offset to tail pixels
+          drawX += tailSwishOffset / ps; // Convert pixel offset to sprite coordinates
+        }
+
         this.ctx.fillStyle = colors[colorIndex];
         this.ctx.fillRect(
-          Math.floor(x * ps),
-          Math.floor(y * ps),
+          Math.floor(drawX * ps),
+          Math.floor(drawY * ps),
           Math.ceil(ps),
           Math.ceil(ps)
         );
       }
     }
+  }
+
+  /**
+   * Clear sprite cache (useful when canvas is resized)
+   */
+  clearCache(): void {
+    this.spriteCache.clear();
+  }
+
+  /**
+   * Get cache statistics for performance monitoring
+   */
+  getCacheStats() {
+    return this.spriteCache.getStats();
+  }
+
+  /**
+   * Get cache hit rate percentage
+   */
+  getCacheHitRate(): number {
+    return this.spriteCache.getHitRate();
   }
 }

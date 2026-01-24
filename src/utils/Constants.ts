@@ -31,6 +31,31 @@ export const ANIMATION = {
   CLEAR_ANIMATION_DURATION: 300, // milliseconds for line clear animation
 } as const;
 
+export const CAT_ANIMATION = {
+  // Movement
+  WALK_SPEED: 20, // pixels per second
+  WALK_EASE: 'easeInOutQuad' as const, // Easing function name for walking
+
+  // State transitions
+  STATE_TRANSITION_DURATION: 500, // milliseconds for state changes (sit ↔ stand)
+
+  // Breathing effect (for sitting/idle states)
+  BREATHING_AMPLITUDE: 1.5, // pixels of vertical movement
+  BREATHING_FREQUENCY: 0.5, // Hz (cycles per second) - slow, calm breathing
+
+  // Idle variations (yawn, stretch, groom)
+  IDLE_VARIATION_CHANCE: 0.02, // 2% chance per second
+  IDLE_VARIATION_DURATION: 1000, // milliseconds for idle variation animations
+
+  // Ear twitch
+  EAR_TWITCH_CHANCE: 0.03, // 3% chance per second
+  EAR_TWITCH_DURATION: 250, // milliseconds
+
+  // Tail swish
+  TAIL_SWISH_DURATION: 1500, // milliseconds for one complete swish cycle
+  TAIL_SWISH_AMPLITUDE: 2, // pixels of tail movement
+} as const;
+
 export const STORAGE = {
   AUTO_SAVE_DEBOUNCE: 300, // milliseconds
   DB_NAME: 'PurrfectBlocksDB',
