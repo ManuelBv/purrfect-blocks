@@ -10,32 +10,20 @@ export interface SavedGameState {
 
 export class GameStorage {
   private dbName = 'PurrfectBlocksDB';
-  private dbVersion = 2; // Incremented to force clean database recreation
+  private dbVersion = 3; // Incremented to force clean database recreation
   private storeName = 'gameState';
   private db: IDBDatabase | null = null;
-  private useLocalStorage: boolean = false; // Fallback flag
+  private useLocalStorage: boolean = true; // Use localStorage by default to avoid IndexedDB blocking issues
   private localStorageKey: string = 'purrfectBlocks_gameState';
 
   /**
-   * Initialize IndexedDB connection (with localStorage fallback)
-   * This method will NEVER throw - it always falls back to localStorage
+   * Initialize storage - now uses localStorage by default
+   * This method will NEVER throw
    */
   async init(): Promise<void> {
-    // Try IndexedDB first
-    try {
-      await this.initIndexedDB();
-      console.log('[GameStorage] Using IndexedDB');
-      this.useLocalStorage = false;
-    } catch (error) {
-      console.warn('[GameStorage] IndexedDB failed, falling back to localStorage:', error);
-      this.useLocalStorage = true;
-      // Migrate existing IndexedDB data to localStorage if possible
-      try {
-        await this.migrateToLocalStorage();
-      } catch (migrationError) {
-        console.warn('[GameStorage] Migration failed, starting fresh with localStorage');
-      }
-    }
+    // Use localStorage directly - simpler and avoids IndexedDB blocking issues
+    console.log('[GameStorage] Using localStorage for game state');
+    this.useLocalStorage = true;
 
     // Verify localStorage is actually available
     try {
@@ -120,13 +108,15 @@ export class GameStorage {
         console.log('IndexedDB onupgradeneeded fired for GameStorage');
         const db = (event.target as IDBOpenDBRequest).result;
 
-        // Only manage our own object store, don't touch others (like playerSettings)
-        if (!db.objectStoreNames.contains(this.storeName)) {
-          db.createObjectStore(this.storeName, { keyPath: 'id' });
-          console.log('Created game state object store');
-        } else {
-          console.log('Game state object store already exists');
+        // Delete old object store if it exists (clean slate for new version)
+        if (db.objectStoreNames.contains(this.storeName)) {
+          db.deleteObjectStore(this.storeName);
+          console.log('Deleted old game state object store');
         }
+
+        // Create fresh object store
+        db.createObjectStore(this.storeName, { keyPath: 'id' });
+        console.log('Created new game state object store');
       };
 
       // Timeout after 10 seconds (increased from 5)

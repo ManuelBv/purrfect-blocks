@@ -143,6 +143,10 @@ The cat-builder agent uses this skill internally to process screenshots.
 - Do NOT make assumptions about performance improvements without profiling data
 - Be honest about the current state - if animations are janky, say so
 - If there's only one sprite being used for all states, acknowledge that limitation
+- **NEVER specify status claims like "fully functional", "error-free", "working perfectly" without substantiation**
+  - ✅ GOOD: "Build completed successfully with exit code 0. TypeScript compilation passed with no errors."
+  - ❌ BAD: "Status: Fully functional and error-free!"
+  - Always explain WHY something is claimed to work, with evidence (build output, test results, console logs, etc.)
 
 ## Current Cat Animation Issues (as of 2026-01-24)
 

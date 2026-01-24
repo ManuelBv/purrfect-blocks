@@ -22,13 +22,13 @@ export function getColors(darkMode: boolean) {
   return darkMode ? DARK_MODE_COLORS : COLORS;
 }
 
-// Piece colors array for assignment - using warm orange tones
+// Piece colors array for assignment - distinct solid colors
 export const PIECE_COLORS = [
-  COLORS.BURNT_ORANGE,  // Bright orange
-  '#E64A19',            // Darker orange
-  '#FF5722',            // Vibrant orange-red
-  '#F4511E',            // Medium orange
-  '#D84315',            // Deep orange
+  '#E53935',  // Red
+  '#1E88E5',  // Blue
+  '#43A047',  // Green
+  '#FDD835',  // Yellow
+  '#6D4C41',  // Coffee (Mocha)
 ];
 
 // UI Colors

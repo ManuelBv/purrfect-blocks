@@ -1,15 +1,15 @@
 // Game constants
 
 export const GRID_CONFIG = {
-  ROWS: 18,
-  COLS: 12,
+  ROWS: 8,
+  COLS: 8,
 
   // Desktop: Board takes ~45% of screen height
   DESKTOP_BOARD_HEIGHT_RATIO: 0.45,
 
-  // Mobile: Board takes ~62.5% of screen height (increased 50% total from original 0.40)
+  // Mobile: Board takes ~50% of screen height (20% smaller than 0.625)
   // With header (60px), HUD (40px), controls (40px), padding (50px) = ~190px reserved
-  MOBILE_BOARD_HEIGHT_RATIO: 0.625,
+  MOBILE_BOARD_HEIGHT_RATIO: 0.5,
 
   // Breakpoint
   MOBILE_BREAKPOINT: 768,

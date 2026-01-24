@@ -93,13 +93,12 @@ async function init() {
   const boardCanvas = document.getElementById('board-canvas') as HTMLCanvasElement;
   const panelCanvas = document.getElementById('panel-canvas') as HTMLCanvasElement;
   const effectsCanvas = document.getElementById('effects-canvas') as HTMLCanvasElement;
-  const catsCanvas = document.getElementById('cats-canvas') as HTMLCanvasElement;
 
   if (!boardCanvas || !panelCanvas || !effectsCanvas) {
     throw new Error('Canvas elements not found');
   }
 
-  game = new Game(boardCanvas, panelCanvas, effectsCanvas, catsCanvas);
+  game = new Game(boardCanvas, panelCanvas, effectsCanvas);
 
   // Setup restart button
   const restartBtn = document.getElementById('restart-btn');
@@ -340,53 +339,8 @@ function initCatTester() {
 }
 
 function initPerformanceMonitor() {
-  // Update performance stats every second (only in dev mode)
-  const updatePerformanceStats = () => {
-    const hitRateEl = document.getElementById('cache-hit-rate');
-    const cacheSizeEl = document.getElementById('cache-size');
-    const cacheMemoryEl = document.getElementById('cache-memory');
-    const cacheHitsEl = document.getElementById('cache-hits');
-    const cacheMissesEl = document.getElementById('cache-misses');
-
-    if (!game || !hitRateEl) return;
-
-    const stats = game.getCacheStats();
-    const hitRate = game.getCacheHitRate();
-
-    if (stats && hitRateEl && cacheSizeEl && cacheMemoryEl && cacheHitsEl && cacheMissesEl) {
-      hitRateEl.textContent = `${hitRate.toFixed(1)}%`;
-      cacheSizeEl.textContent = `${stats.size} sprites`;
-
-      const kb = stats.memoryUsageBytes / 1024;
-      if (kb < 1024) {
-        cacheMemoryEl.textContent = `${kb.toFixed(1)} KB`;
-      } else {
-        const mb = kb / 1024;
-        cacheMemoryEl.textContent = `${mb.toFixed(1)} MB`;
-      }
-
-      cacheHitsEl.textContent = stats.hits.toString();
-      cacheMissesEl.textContent = stats.misses.toString();
-    } else if (hitRateEl && cacheSizeEl && cacheMemoryEl && cacheHitsEl && cacheMissesEl) {
-      hitRateEl.textContent = 'N/A';
-      cacheSizeEl.textContent = 'N/A';
-      cacheMemoryEl.textContent = 'N/A';
-      cacheHitsEl.textContent = 'N/A';
-      cacheMissesEl.textContent = 'N/A';
-    }
-  };
-
-  // Update stats every second
-  setInterval(updatePerformanceStats, 1000);
-
-  // Clear cache button
-  const clearCacheBtn = document.getElementById('clear-sprite-cache');
-  if (clearCacheBtn && game) {
-    clearCacheBtn.addEventListener('click', () => {
-      game!.clearSpriteCache();
-      updatePerformanceStats(); // Update display immediately
-    });
-  }
+  // Performance monitoring removed - cat rendering disabled
+  // This function is kept for potential future use
 }
 
 function initSpriteGallery() {

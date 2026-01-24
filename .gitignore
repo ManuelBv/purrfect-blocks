@@ -34,3 +34,4 @@ playwright-report
 settings.local.json
 .env
 public
+build_output*
