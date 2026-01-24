@@ -1,8 +1,10 @@
 // Cat Sprite Tester - for testing and previewing cat sprites
 
 import type { CatType } from '../entities/Cat';
-import { sittingCatFullSprite } from './sprites/SittingCatFullSprite';
-import { sittingCatHalfSprite, sittingCatFullCleanedSprite } from './sprites/SittingCatHalfSprite';
+import { sittingFrontCatSprite } from './sprites/SittingFrontCatSprite';
+import { sittingTailCatSprite } from './sprites/SittingTailCatSprite';
+import { standingCatSprite as standingCatFullSprite } from './sprites/StandingCatSprite';
+import { lyingCatSprite as lyingCatFullSprite } from './sprites/LyingCatSprite';
 
 // Color indices for sprite matrices
 // 0 = transparent
@@ -15,7 +17,7 @@ import { sittingCatHalfSprite, sittingCatFullCleanedSprite } from './sprites/Sit
 // 7 = eye dark
 // 8 = eye highlight
 
-type SpriteType = 'sitting' | 'sitting2' | 'standing' | 'lying' | 'sittingFull' | 'sittingFullClean' | 'sittingHalf';
+type SpriteType = 'sitting' | 'sitting2' | 'standing' | 'lying' | 'sittingFront' | 'sittingTail' | 'standingFull' | 'lyingFull';
 
 export class CatTester {
   private canvas: HTMLCanvasElement;
@@ -176,12 +178,14 @@ export class CatTester {
         return this.standingSprite;
       case 'lying':
         return this.lyingSprite;
-      case 'sittingFull':
-        return sittingCatFullSprite;
-      case 'sittingFullClean':
-        return sittingCatFullCleanedSprite;
-      case 'sittingHalf':
-        return sittingCatHalfSprite;
+      case 'sittingFront':
+        return sittingFrontCatSprite;
+      case 'sittingTail':
+        return sittingTailCatSprite;
+      case 'standingFull':
+        return standingCatFullSprite;
+      case 'lyingFull':
+        return lyingCatFullSprite;
       default:
         return this.sittingSprite;
     }
@@ -193,13 +197,14 @@ export class CatTester {
     const height = sprite.length;
 
     const names: Record<SpriteType, string> = {
-      sitting: 'sittingSprite',
-      sitting2: 'sittingSprite2',
-      standing: 'standingSprite',
-      lying: 'lyingSprite',
-      sittingFull: 'sittingCatFullSprite (123x124)',
-      sittingFullClean: 'sittingCatFullCleanedSprite (123x124 cleaned)',
-      sittingHalf: 'sittingCatHalfSprite (62x62)',
+      sitting: 'sittingSprite (19x21)',
+      sitting2: 'sittingSprite2 (18x17)',
+      standing: 'standingSprite (24x19)',
+      lying: 'lyingSprite (24x14)',
+      sittingFront: 'sittingFrontCatSprite (140x132)',
+      sittingTail: 'sittingTailCatSprite (148x136)',
+      standingFull: 'standingCatSprite (192x160)',
+      lyingFull: 'lyingCatSprite (163x86)',
     };
 
     return {

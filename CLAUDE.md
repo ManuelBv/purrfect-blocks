@@ -137,3 +137,16 @@ The cat-builder agent uses this skill internally to process screenshots.
 | `src/rendering/CatRenderer.ts` | Cat sprite matrices and rendering |
 | `src/entities/Cat.ts` | Cat entity with animation states |
 | `src/utils/constants.ts` | Configuration values |
+## Communication Guidelines
+
+- Do NOT claim work is "high quality" or "good performance" unless backed by actual measured numbers and visual proof
+- Do NOT make assumptions about performance improvements without profiling data
+- Be honest about the current state - if animations are janky, say so
+- If there's only one sprite being used for all states, acknowledge that limitation
+
+## Current Cat Animation Issues (as of 2026-01-24)
+
+1. Performance is still bad, especially during Y translation movements
+2. Only ONE sprite (sittingCatFullSprite) is used for ALL states - no visual distinction between sitting/standing/walking/etc.
+3. The state machine changes internal state but visually the cat looks the same
+4. Need separate sprite assets for each animation state to have meaningful visual differences

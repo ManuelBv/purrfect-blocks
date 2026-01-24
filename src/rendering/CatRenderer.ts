@@ -1,7 +1,10 @@
 // Pixel art cats using sprite matrices
 
 import type { Cat, CatAnimationState, CatType } from '../entities/Cat';
-import { sittingCatFullSprite } from './sprites/SittingCatFullSprite';
+import { standingCatSprite } from './sprites/StandingCatSprite';
+import { lyingCatSprite } from './sprites/LyingCatSprite';
+import { sittingTailCatSprite } from './sprites/SittingTailCatSprite';
+import { sittingFrontCatSprite } from './sprites/SittingFrontCatSprite';
 import { SpriteCache } from './SpriteCache';
 
 // Color indices for sprite matrices
@@ -128,7 +131,13 @@ export class CatRenderer {
    * Caches both cat types in common states at typical sizes
    */
   private prewarmCache(): void {
-    const commonStates: CatAnimationState[] = ['SITTING', 'IDLE', 'EXCITED'];
+    // Pre-cache all states that have different sprites
+    const commonStates: CatAnimationState[] = [
+      'SITTING',    // sittingFrontCatSprite (140×132)
+      'STANDING',   // standingCatSprite (192×160)
+      'GAME_OVER',  // lyingCatSprite (163×86)
+      'YAWNING',    // sittingTailCatSprite (148×136)
+    ];
     const catTypes: CatType[] = ['ORANGE_TABBY', 'WHITE_LONGHAIR'];
     const commonSizes = [120, 152, 180]; // Larger sizes for full-res sprites
 
@@ -220,23 +229,28 @@ export class CatRenderer {
 
   /**
    * Get sprite matrix for a given animation state
-   * Uses the full-resolution 123x124 sprite for best quality
+   * Uses full-resolution sprites extracted from cat.jpg:
+   * - sittingFrontCatSprite: 140×132 (sitting front view - default)
+   * - standingCatSprite: 192×160 (standing pose)
+   * - lyingCatSprite: 163×86 (lying down pose)
+   * - sittingTailCatSprite: 148×136 (sitting with tail visible)
    */
   private getSpriteForState(state: CatAnimationState): number[][] {
-    // Use full-resolution sprite for all states (best quality)
-    // In the future, we can create full-res versions of standing/lying sprites
     switch (state) {
-      case 'WALKING':
       case 'STANDING':
+      case 'WALKING':
+        return standingCatSprite;
       case 'GAME_OVER':
+        return lyingCatSprite;
       case 'YAWNING':
       case 'STRETCHING':
-      case 'SITTING':
+        return sittingTailCatSprite;
       case 'IDLE':
+      case 'SITTING':
       case 'EXCITED':
       case 'SWAT':
       default:
-        return sittingCatFullSprite;
+        return sittingFrontCatSprite;
     }
   }
 

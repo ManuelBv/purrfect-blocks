@@ -33,3 +33,4 @@ playwright-report
 # Miscellaneous
 settings.local.json
 .env
+public

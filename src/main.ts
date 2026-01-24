@@ -4,6 +4,7 @@ import { Game } from './game/GamePhase2';
 import { PlayerSettingsManager, PlayerSettings, generateUUID } from './utils/playerSettings';
 import { generateGreeting } from './utils/kittenMessages';
 import { CatTester } from './rendering/CatTester';
+import { SpriteGallery } from './rendering/SpriteGallery';
 import type { CatType } from './entities/Cat';
 import './styles/main.css';
 
@@ -253,6 +254,9 @@ async function init() {
   // Initialize Performance Monitor
   initPerformanceMonitor();
 
+  // Initialize Sprite Gallery
+  initSpriteGallery();
+
   console.log('Purrfect Blocks Phase 2 initialized! 🐱☕ Drag pieces from panel to board!');
 }
 
@@ -301,7 +305,7 @@ function initCatTester() {
   // State/sprite select
   if (stateSelect) {
     stateSelect.addEventListener('change', () => {
-      catTester.setSprite(stateSelect.value as 'sitting' | 'sitting2' | 'standing' | 'lying' | 'sittingFull' | 'sittingFullClean' | 'sittingHalf');
+      catTester.setSprite(stateSelect.value as 'sitting' | 'sitting2' | 'standing' | 'lying' | 'sittingFront' | 'sittingTail' | 'standingFull' | 'lyingFull');
       catTester.render();
       updateInfo();
     });
@@ -381,6 +385,39 @@ function initPerformanceMonitor() {
     clearCacheBtn.addEventListener('click', () => {
       game!.clearSpriteCache();
       updatePerformanceStats(); // Update display immediately
+    });
+  }
+}
+
+function initSpriteGallery() {
+  const galleryGrid = document.getElementById('sprite-gallery-grid');
+  if (!galleryGrid) return;
+
+  const gallery = new SpriteGallery();
+
+  // Get UI elements
+  const typeSelect = document.getElementById('gallery-cat-type') as HTMLSelectElement;
+  const scaleSlider = document.getElementById('gallery-scale') as HTMLInputElement;
+  const scaleValue = document.getElementById('gallery-scale-value');
+
+  // Initial render
+  gallery.renderAll();
+
+  // Cat type select
+  if (typeSelect) {
+    typeSelect.addEventListener('change', () => {
+      gallery.setType(typeSelect.value as CatType);
+      gallery.renderAll();
+    });
+  }
+
+  // Scale slider
+  if (scaleSlider && scaleValue) {
+    scaleSlider.addEventListener('input', () => {
+      const scale = parseInt(scaleSlider.value);
+      scaleValue.textContent = `${scale}x`;
+      gallery.setScale(scale);
+      gallery.renderAll();
     });
   }
 }

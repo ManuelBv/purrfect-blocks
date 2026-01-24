@@ -83,13 +83,14 @@
           <div class="cat-test-row">
             <label for="cat-state-select">Sprite:</label>
             <select id="cat-state-select">
-              <option value="sitting">Sitting (19x21)</option>
-              <option value="sitting2">Sitting v2 (18x17)</option>
-              <option value="standing">Standing (24x19)</option>
-              <option value="lying">Lying (24x14)</option>
-              <option value="sittingFull">Full Resolution (123x124)</option>
-              <option value="sittingFullClean">Full Cleaned (123x124)</option>
-              <option value="sittingHalf">Half Resolution (62x62)</option>
+              <option value="sitting">Basic Sitting (19x21)</option>
+              <option value="sitting2">Basic Sitting v2 (18x17)</option>
+              <option value="standing">Basic Standing (24x19)</option>
+              <option value="lying">Basic Lying (24x14)</option>
+              <option value="sittingFront">Sitting Front (140x132)</option>
+              <option value="sittingTail">Sitting Tail (148x136)</option>
+              <option value="standingFull">Standing Full (192x160)</option>
+              <option value="lyingFull">Lying Full (163x86)</option>
             </select>
           </div>
           <div class="cat-test-row">
@@ -147,6 +148,47 @@
           <label>Your Unique ID</label>
           <div class="uuid-subtitle">Cannot be edited</div>
           <div class="uuid-value" id="player-uuid">-</div>
+        </div>
+      </div>
+
+      <!-- Sprite Gallery -->
+      <div class="sprite-gallery-panel">
+        <h3>All Cat Sprites Gallery</h3>
+        <div class="sprite-gallery-controls">
+          <div class="sprite-gallery-row">
+            <label for="gallery-cat-type">Cat Type:</label>
+            <select id="gallery-cat-type">
+              <option value="ORANGE_TABBY">Orange Tabby</option>
+              <option value="WHITE_LONGHAIR">White Longhair</option>
+            </select>
+          </div>
+          <div class="sprite-gallery-row">
+            <label for="gallery-scale">Scale:</label>
+            <input type="range" id="gallery-scale" min="1" max="4" value="1">
+            <span id="gallery-scale-value">1x</span>
+          </div>
+        </div>
+        <div class="sprite-gallery-grid" id="sprite-gallery-grid">
+          <div class="sprite-card">
+            <canvas id="gallery-sitting-front" width="200" height="200"></canvas>
+            <div class="sprite-label">Sitting Front (140x132)</div>
+            <div class="sprite-state">IDLE, SITTING, EXCITED, SWAT</div>
+          </div>
+          <div class="sprite-card">
+            <canvas id="gallery-sitting-tail" width="200" height="200"></canvas>
+            <div class="sprite-label">Sitting Tail (148x136)</div>
+            <div class="sprite-state">YAWNING, STRETCHING</div>
+          </div>
+          <div class="sprite-card">
+            <canvas id="gallery-standing" width="200" height="200"></canvas>
+            <div class="sprite-label">Standing (192x160)</div>
+            <div class="sprite-state">STANDING, WALKING</div>
+          </div>
+          <div class="sprite-card">
+            <canvas id="gallery-lying" width="200" height="200"></canvas>
+            <div class="sprite-label">Lying (163x86)</div>
+            <div class="sprite-state">GAME_OVER</div>
+          </div>
         </div>
       </div>
     </div>
