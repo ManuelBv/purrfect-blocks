@@ -6,8 +6,8 @@
   <title>Purrfect Blocks - Cozy Block Puzzle Game</title>
   <meta name="description" content="A cozy block puzzle game with cats and coffee vibes">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23D4A574' rx='20'/%3E%3Ctext x='50' y='70' font-size='60' text-anchor='middle' font-family='Arial, sans-serif'%3E🐱%3C/text%3E%3C/svg%3E">
-  <script type="module" crossorigin src="/purrfect-blocks/assets/index.fVBKj5DF.js"></script>
-  <link rel="stylesheet" crossorigin href="/purrfect-blocks/assets/index.CMmIGrrF.css">
+  <script type="module" crossorigin src="/purrfect-blocks/assets/index.UqxGDEnE.js"></script>
+  <link rel="stylesheet" crossorigin href="/purrfect-blocks/assets/index.CXnSv8EG.css">
 </head>
 <body>
   <header class="game-header">
@@ -35,6 +35,7 @@
 
     <div class="game-area">
       <canvas id="effects-canvas" class="effects-overlay"></canvas>
+      <canvas id="cats-canvas" class="cats-overlay"></canvas>
 
       <canvas id="board-canvas" class="game-canvas"></canvas>
 
@@ -49,23 +50,36 @@
 
     <div class="instructions">
       <p>🎮 Click a piece, then drag it to the board!</p>
-      <p class="phase-info">Phase 2: Complete - IndexedDB Persistence & Settings</p>
     </div>
 
-    <!-- Audio Test Buttons -->
-    <div class="audio-test-panel">
-      <h3>Audio Test</h3>
-      <div class="audio-test-buttons">
-        <button id="test-piece-placed">Piece Placed</button>
-        <button id="test-line-clear">Line Clear</button>
-        <button id="test-bomb-explosion">Bomb Explosion</button>
-        <button id="test-cascade-2x">Cascade 2x</button>
-        <button id="test-cascade-3x">Cascade 3x</button>
-        <button id="test-cascade-4x">Cascade 4x</button>
-        <button id="test-game-over">Game Over</button>
-        <button id="test-success">Success</button>
-        <button id="test-invalid">Invalid</button>
+    <!-- Dev Tools Area (hidden by default, shown when dev mode enabled) -->
+    <div id="dev-tools-area" class="dev-tools-area hidden">
+      <!-- Audio Test Buttons -->
+      <div class="audio-test-panel">
+        <h3>Audio Test</h3>
+        <div class="audio-test-buttons">
+          <button id="test-piece-placed">Piece Placed</button>
+          <button id="test-line-clear">Line Clear</button>
+          <button id="test-bomb-explosion">Bomb Explosion</button>
+          <button id="test-cascade-2x">Cascade 2x</button>
+          <button id="test-cascade-3x">Cascade 3x</button>
+          <button id="test-cascade-4x">Cascade 4x</button>
+          <button id="test-game-over">Game Over</button>
+          <button id="test-success">Success</button>
+          <button id="test-invalid">Invalid</button>
+        </div>
       </div>
+
+      <!-- Extra Details (moved from settings modal) -->
+      <div class="extra-details-panel">
+        <h3>Extra Details</h3>
+        <div class="setting-item uuid-section">
+          <label>Your Unique ID</label>
+          <div class="uuid-subtitle">Cannot be edited</div>
+          <div class="uuid-value" id="player-uuid">-</div>
+        </div>
+      </div>
+
     </div>
 
     <!-- Game Over Modal -->
@@ -99,17 +113,14 @@
               <button id="mute-toggle" class="mute-btn">🔊</button>
             </div>
           </div>
+          <div class="setting-item dev-mode-control">
+            <label for="dev-mode-checkbox" class="checkbox-label">
+              <input type="checkbox" id="dev-mode-checkbox">
+              <span>Enable Dev Mode</span>
+            </label>
+          </div>
         </div>
         <button id="save-settings-btn" class="save-settings-btn">Save Settings</button>
-
-        <details class="extra-details">
-          <summary>Extra details</summary>
-          <div class="setting-item uuid-section">
-            <label>Your Unique ID</label>
-            <div class="uuid-subtitle">Cannot be edited</div>
-            <div class="uuid-value" id="player-uuid">-</div>
-          </div>
-        </details>
       </div>
     </div>
   </div>
