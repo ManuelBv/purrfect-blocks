@@ -310,8 +310,8 @@ export class Game {
         effectsCtx.restore();
 
         // Draw piece following cursor (in game-area space)
-        // Make dragging piece 25% bigger for better visibility
-        const dragCellSize = cellSize * 1.25;
+        // Use actual cell size for dragging piece
+        const dragCellSize = cellSize * 1.0;
 
         // dragState coordinates are relative to board canvas, so add board offset
         // For touch: apply -50% offset (instead of previous 50%) so shadow offset is smaller
@@ -322,8 +322,8 @@ export class Game {
         PieceRenderer.renderPiece(
           effectsCtx,
           dragState.piece,
-          dragState.currentX + boardOffsetX - cellSize + touchOffsetX,
-          dragState.currentY + boardOffsetY - cellSize + touchOffsetY,
+          dragState.currentX + boardOffsetX - cellSize * 0.5 + touchOffsetX,
+          dragState.currentY + boardOffsetY - cellSize * 0.5 + touchOffsetY,
           dragCellSize,
           0.8
         );

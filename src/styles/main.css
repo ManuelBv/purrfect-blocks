@@ -756,9 +756,13 @@ button:active {
   border-radius: 8px;
 }
 
+.extra-details-panel .uuid-section label {
+  color: var(--color-cream);
+}
+
 .extra-details-panel .uuid-subtitle {
   font-size: 0.8rem;
-  color: var(--color-caramel);
+  color: var(--color-cream);
   margin-bottom: 8px;
 }
 

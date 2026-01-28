@@ -3,9 +3,6 @@
 import { Game } from './game/GamePhase2';
 import { PlayerSettingsManager, PlayerSettings, generateUUID } from './utils/playerSettings';
 import { generateGreeting } from './utils/kittenMessages';
-import { CatTester } from './rendering/CatTester';
-import { SpriteGallery } from './rendering/SpriteGallery';
-import type { CatType } from './entities/Cat';
 import './styles/main.css';
 
 let playerSettingsManager: PlayerSettingsManager;
@@ -247,133 +244,15 @@ async function init() {
     });
   }
 
-  // Initialize Cat Tester
-  initCatTester();
-
   // Initialize Performance Monitor
   initPerformanceMonitor();
 
-  // Initialize Sprite Gallery
-  initSpriteGallery();
-
   console.log('Purrfect Blocks Phase 2 initialized! 🐱☕ Drag pieces from panel to board!');
-}
-
-function initCatTester() {
-  const catTestCanvas = document.getElementById('cat-test-canvas') as HTMLCanvasElement;
-  if (!catTestCanvas) return;
-
-  const catTester = new CatTester(catTestCanvas);
-
-  // Get UI elements
-  const typeSelect = document.getElementById('cat-type-select') as HTMLSelectElement;
-  const stateSelect = document.getElementById('cat-state-select') as HTMLSelectElement;
-  const scaleSlider = document.getElementById('cat-scale-slider') as HTMLInputElement;
-  const scaleValue = document.getElementById('cat-scale-value');
-  const renderBtn = document.getElementById('cat-test-render');
-  const flipBtn = document.getElementById('cat-test-flip');
-  const clearBtn = document.getElementById('cat-test-clear');
-  const spriteInfo = document.getElementById('cat-sprite-info');
-  const dimensionsInfo = document.getElementById('cat-dimensions-info');
-
-  // Update info display
-  const updateInfo = () => {
-    const info = catTester.getSpriteInfo();
-    if (spriteInfo) spriteInfo.textContent = info.name;
-    if (dimensionsInfo) dimensionsInfo.textContent = `${info.width}x${info.height}`;
-  };
-
-  // Scale slider
-  if (scaleSlider && scaleValue) {
-    scaleSlider.addEventListener('input', () => {
-      const scale = parseInt(scaleSlider.value);
-      scaleValue.textContent = `${scale}x`;
-      catTester.setScale(scale);
-      catTester.render();
-    });
-  }
-
-  // Type select
-  if (typeSelect) {
-    typeSelect.addEventListener('change', () => {
-      catTester.setType(typeSelect.value as CatType);
-      catTester.render();
-    });
-  }
-
-  // State/sprite select
-  if (stateSelect) {
-    stateSelect.addEventListener('change', () => {
-      catTester.setSprite(stateSelect.value as 'sitting' | 'sitting2' | 'standing' | 'lying' | 'sittingFront' | 'sittingTail' | 'standingFull' | 'lyingFull');
-      catTester.render();
-      updateInfo();
-    });
-  }
-
-  // Render button
-  if (renderBtn) {
-    renderBtn.addEventListener('click', () => {
-      catTester.render();
-      updateInfo();
-    });
-  }
-
-  // Flip button
-  if (flipBtn) {
-    flipBtn.addEventListener('click', () => {
-      catTester.toggleFlip();
-      catTester.render();
-    });
-  }
-
-  // Clear button
-  if (clearBtn) {
-    clearBtn.addEventListener('click', () => {
-      catTester.clear();
-    });
-  }
-
-  // Initial render
-  catTester.render();
-  updateInfo();
 }
 
 function initPerformanceMonitor() {
   // Performance monitoring removed - cat rendering disabled
   // This function is kept for potential future use
-}
-
-function initSpriteGallery() {
-  const galleryGrid = document.getElementById('sprite-gallery-grid');
-  if (!galleryGrid) return;
-
-  const gallery = new SpriteGallery();
-
-  // Get UI elements
-  const typeSelect = document.getElementById('gallery-cat-type') as HTMLSelectElement;
-  const scaleSlider = document.getElementById('gallery-scale') as HTMLInputElement;
-  const scaleValue = document.getElementById('gallery-scale-value');
-
-  // Initial render
-  gallery.renderAll();
-
-  // Cat type select
-  if (typeSelect) {
-    typeSelect.addEventListener('change', () => {
-      gallery.setType(typeSelect.value as CatType);
-      gallery.renderAll();
-    });
-  }
-
-  // Scale slider
-  if (scaleSlider && scaleValue) {
-    scaleSlider.addEventListener('input', () => {
-      const scale = parseInt(scaleSlider.value);
-      scaleValue.textContent = `${scale}x`;
-      gallery.setScale(scale);
-      gallery.renderAll();
-    });
-  }
 }
 
 // Initialize when DOM is ready
