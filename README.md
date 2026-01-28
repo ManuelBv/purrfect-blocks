@@ -74,4 +74,4 @@ The Vite build creates an optimized bundle:
 
 MIT
 
-Have fun!!!
+Have fun!
