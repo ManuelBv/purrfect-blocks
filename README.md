@@ -73,3 +73,5 @@ The Vite build creates an optimized bundle:
 ## License
 
 MIT
+
+Have fun!
