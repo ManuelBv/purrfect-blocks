@@ -125,3 +125,5 @@ activate_skill({ name: "skill-creator" });
 2. Only ONE sprite (sittingCatFullSprite) is used for ALL states - no visual distinction between sitting/standing/walking/etc.
 3. The state machine changes internal state but visually the cat looks the same
 4. Need separate sprite assets for each animation state to have meaningful visual differences
+
+**Note: Work on "Current Cat Animation Issues" is paused until further instruction from the user.**
