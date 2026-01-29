@@ -2,7 +2,7 @@
 
 import { Tween } from '../utils/AnimationUtils';
 import { easeInOutQuad, easeOutQuad } from '../utils/Easing';
-import { CAT_ANIMATION } from '../utils/constants';
+import { CAT_ANIMATION } from '../utils/Constants';
 
 export type CatAnimationState = 'IDLE' | 'SITTING' | 'STANDING' | 'WALKING' | 'SWAT' | 'EXCITED' | 'GAME_OVER' | 'YAWNING' | 'STRETCHING';
 export type CatType = 'WHITE_LONGHAIR' | 'ORANGE_TABBY';

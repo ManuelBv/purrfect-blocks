@@ -1,6 +1,6 @@
 // Score calculation with cascade bonuses
 
-import { SCORING } from '../utils/constants';
+import { SCORING } from '../utils/Constants';
 
 export class ScoreManager {
   private score: number = 0;

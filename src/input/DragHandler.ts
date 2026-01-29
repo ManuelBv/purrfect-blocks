@@ -51,11 +51,10 @@ export class DragHandler {
     this.dragState.currentX = mouseX;
     this.dragState.currentY = mouseY;
 
-    // For touch: adjust grid calculation to account for visual offset (-50%)
     let adjustedX = mouseX;
     let adjustedY = mouseY;
 
-    if (this.dragState.isTouch && this.dragState.piece) {
+    if (this.dragState.piece) {
       const pieceWidth = this.dragState.piece.shape[0].length * cellSize;
       const pieceHeight = this.dragState.piece.shape.length * cellSize;
       adjustedX = mouseX - pieceWidth * 0.5;

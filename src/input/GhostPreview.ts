@@ -2,7 +2,7 @@
 
 import type { PieceShape } from '../types/PieceTypes';
 import type { Cell } from '../board/Cell';
-import { GRID_CONFIG } from '../utils/constants';
+import { GRID_CONFIG } from '../utils/Constants';
 
 export class GhostPreview {
   /**

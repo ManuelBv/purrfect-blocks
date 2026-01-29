@@ -1,6 +1,6 @@
 // 12×18 grid state management
 
-import { GRID_CONFIG } from '../utils/constants';
+import { GRID_CONFIG } from '../utils/Constants';
 import { Cell } from '../board/Cell';
 import { GridManager } from '../board/GridManager';
 import type { CellData, CompleteLines } from '../types/GameTypes';
