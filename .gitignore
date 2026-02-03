@@ -35,3 +35,6 @@ settings.local.json
 .env
 public
 build_output*
+
+# Session archives
+archived/
