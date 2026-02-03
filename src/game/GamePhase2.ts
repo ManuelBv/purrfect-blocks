@@ -292,7 +292,7 @@ export class Game {
         const boardOffsetX = boardRect.left - gameAreaRect.left;
         const boardOffsetY = boardRect.top - gameAreaRect.top;
 
-        // Draw ghost preview on board (with offset)
+        // Draw ghost preview and border highlights for completed lines (with offset)
         effectsCtx.save();
         effectsCtx.translate(boardOffsetX, boardOffsetY);
 
@@ -304,7 +304,8 @@ export class Game {
           cellSize,
           dragState.isValid,
           dragState.piece.color,
-          this.board.getCells()
+          this.board.getCells(),
+          true // Show ghost piece preview
         );
 
         effectsCtx.restore();
@@ -313,17 +314,16 @@ export class Game {
         // Use actual cell size for dragging piece
         const dragCellSize = cellSize * 1.0;
 
-        // dragState coordinates are relative to board canvas, so add board offset
-        // For touch: apply -50% offset (instead of previous 50%) so shadow offset is smaller
+        // Calculate piece dimensions
         const dims = PieceRenderer.getPieceDimensions(dragState.piece.shape, dragCellSize);
-        const touchOffsetX = dragState.isTouch ? -dims.width * 0.25 : 0;
-        const touchOffsetY = dragState.isTouch ? -dims.height * 0.25 : 0;
 
+        // Position piece with cursor at bottom-center (so piece is visible while dragging)
+        // dragState coordinates are relative to board canvas, so add board offset
         PieceRenderer.renderPiece(
           effectsCtx,
           dragState.piece,
-          dragState.currentX + boardOffsetX - cellSize * 0.5 + touchOffsetX,
-          dragState.currentY + boardOffsetY - cellSize * 0.5 + touchOffsetY,
+          dragState.currentX + boardOffsetX - dims.width / 2,
+          dragState.currentY + boardOffsetY - dims.height,
           dragCellSize,
           0.8
         );

@@ -25,15 +25,11 @@ export class PanelRenderer {
     const screenWidth = window.innerWidth;
     const isMobile = screenWidth < 768;
 
-    // Very small screens (320px): 2px spacing, smaller pieces to fit in one row
-    // Mobile (< 768px): 3px spacing, smaller pieces
-    // Desktop: 28px spacing (30% less than 40px)
-    if (screenWidth <= 380) {
-      this.pieceSpacing = 2;
-      this.cellSize = cellSize * 0.75; // Smaller pieces to fit in one row
-    } else if (isMobile) {
-      this.pieceSpacing = 3;
-      this.cellSize = cellSize * 0.85; // Slightly smaller on mobile
+    // Mobile: 30% smaller pieces with tighter spacing to fit on screen
+    // Desktop: Normal spacing
+    if (isMobile) {
+      this.pieceSpacing = 2; // Tight spacing for mobile
+      this.cellSize = cellSize * 0.70; // 30% smaller pieces
     } else {
       this.pieceSpacing = 28;
       this.cellSize = cellSize;

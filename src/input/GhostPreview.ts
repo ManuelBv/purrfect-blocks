@@ -83,9 +83,10 @@ export class GhostPreview {
     cellSize: number,
     isValid: boolean,
     pieceColor: string,
-    cells?: Cell[][]
+    cells?: Cell[][],
+    showPiece: boolean = true
   ): void {
-    // Only show shadow when placement is valid - ignore invalid placement entirely
+    // Only show when placement is valid - ignore invalid placement entirely
     if (!isValid) return;
 
     // Fallback to a default color if pieceColor is undefined
@@ -131,27 +132,30 @@ export class GhostPreview {
       }
     }
 
-    // Draw ghost with glow effect
-    ctx.shadowBlur = 20;
-    ctx.shadowColor = color;
-    ctx.globalAlpha = 0.5;
+    // Only draw ghost piece if showPiece is true
+    if (showPiece) {
+      // Draw ghost with glow effect
+      ctx.shadowBlur = 20;
+      ctx.shadowColor = color;
+      ctx.globalAlpha = 0.5;
 
-    for (let r = 0; r < shape.length; r++) {
-      for (let c = 0; c < shape[r].length; c++) {
-        if (shape[r][c]) {
-          const x = (col + c) * cellSize;
-          const y = (row + r) * cellSize;
+      for (let r = 0; r < shape.length; r++) {
+        for (let c = 0; c < shape[r].length; c++) {
+          if (shape[r][c]) {
+            const x = (col + c) * cellSize;
+            const y = (row + r) * cellSize;
 
-          // Draw glow border
-          ctx.strokeStyle = color;
-          ctx.lineWidth = 3;
-          ctx.strokeRect(x + 2, y + 2, cellSize - 4, cellSize - 4);
+            // Draw glow border
+            ctx.strokeStyle = color;
+            ctx.lineWidth = 3;
+            ctx.strokeRect(x + 2, y + 2, cellSize - 4, cellSize - 4);
 
-          // Draw semi-transparent fill
-          ctx.fillStyle = color;
-          ctx.globalAlpha = 0.3;
-          ctx.fillRect(x + 3, y + 3, cellSize - 6, cellSize - 6);
-          ctx.globalAlpha = 0.5;
+            // Draw semi-transparent fill
+            ctx.fillStyle = color;
+            ctx.globalAlpha = 0.3;
+            ctx.fillRect(x + 3, y + 3, cellSize - 6, cellSize - 6);
+            ctx.globalAlpha = 0.5;
+          }
         }
       }
     }
