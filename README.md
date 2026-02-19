@@ -6,8 +6,8 @@ A cozy block puzzle game with a warm coffee shop aesthetic and interactive cats.
 
 ## Features
 
-- 12×18 grid with drag-and-drop gameplay
-- 22 unique piece types (tetrominoes + solid squares)
+- 8×8 grid with drag-and-drop gameplay
+- 19 unique piece types (tetrominoes + solid squares)
 - Cascade combo system for high scores
 - Interactive cats that react to your moves
 - Coffee shop color palette
@@ -61,6 +61,38 @@ The Vite build creates an optimized bundle:
 - Favicon embedded as data URL
 - All assets optimized and minified
 - Compatible with GitHub Pages static hosting
+
+## Claude Code Skills
+
+Skills are reusable slash commands for Claude Code, stored in `.claude/skills/`. They extend Claude's behaviour with project-specific or community workflows.
+
+### Installed Skills
+
+| Skill | Command | Source | Purpose |
+|-------|---------|--------|---------|
+| TDD | `/tdd` | `mattpocock/skills/tdd` | Red-green-refactor loop — write one failing test, implement, refactor, repeat |
+| Build Cats | `/build-cats` | project | Convert pixel art screenshots into TypeScript sprite matrices |
+
+### Installing New Skills
+
+```bash
+# Install a community skill from the skills registry
+npx skills add <author>/<skill-name>
+
+# Examples
+npx skills add mattpocock/skills/tdd
+```
+
+Skills are saved to `.claude/skills/` and picked up automatically by Claude Code in this project.
+
+### Using Skills
+
+Type the skill command in a Claude Code conversation:
+
+```
+/tdd          # Start a TDD session for a feature or bug fix
+/build-cats   # Convert a pixel art image into a sprite matrix
+```
 
 ## Tech Stack
 

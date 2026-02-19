@@ -22,23 +22,14 @@ export class PieceFactory {
   }
 
   /**
-   * Create pieces with optional bomb replacement based on combo multiplier
-   * @param count Number of pieces to create
-   * @param comboMultiplier Current combo multiplier (1.0 = no combo, 1.5 = 1.5x, etc.)
-   * @returns Array of pieces with potential bomb replacement
+   * Create a set of random pieces.
+   * Bomb injection is handled by PieceManager's turn-based scheduler, not here.
    */
-  createMultiplePieces(count: number, comboMultiplier: number = 1.0): Piece[] {
+  createMultiplePieces(count: number): Piece[] {
     const pieces: Piece[] = [];
     for (let i = 0; i < count; i++) {
       pieces.push(this.createRandomPiece());
     }
-
-    // Replace one random piece with bomb if combo >= 1.5x
-    if (comboMultiplier >= 1.5 && pieces.length > 0) {
-      const replaceIndex = Math.floor(Math.random() * pieces.length);
-      pieces[replaceIndex] = this.createBombPiece();
-    }
-
     return pieces;
   }
 }

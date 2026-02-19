@@ -3,7 +3,7 @@
 export interface SavedGameState {
   board: number[][];
   score: number;
-  combo: number;
+  streakLevel: number;
   availablePieces: any[];
   timestamp: number;
 }

@@ -1,4 +1,4 @@
-// 12×18 grid state management
+// 8×8 grid state management
 
 import { GRID_CONFIG } from '../utils/Constants';
 import { Cell } from '../board/Cell';
@@ -140,14 +140,15 @@ export class GameBoard {
   }
 
   isFull(): boolean {
-    // Check if there's no valid placement for any piece type
-    // For now, simple check: if top row has any occupied cells
-    for (let c = 0; c < this.cols; c++) {
-      if (this.cells[0][c].occupied) {
-        return true;
+    // Board is full when every cell is occupied (no empty cell = nothing can be placed)
+    for (let r = 0; r < this.rows; r++) {
+      for (let c = 0; c < this.cols; c++) {
+        if (this.cells[r][c].isEmpty()) {
+          return false;
+        }
       }
     }
-    return false;
+    return true;
   }
 
   serialize(): CellData[][] {

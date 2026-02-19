@@ -1,6 +1,6 @@
-// Entry point - Phase 2
+// Entry point
 
-import { Game } from './game/GamePhase2';
+import { Game } from './game/Game';
 import { PlayerSettingsManager, PlayerSettings, generateUUID } from './utils/playerSettings';
 import { generateGreeting } from './utils/kittenMessages';
 import './styles/main.css';
@@ -247,7 +247,7 @@ async function init() {
   // Initialize Performance Monitor
   initPerformanceMonitor();
 
-  console.log('Purrfect Blocks Phase 2 initialized! 🐱☕ Drag pieces from panel to board!');
+  console.log('Purrfect Blocks initialized! 🐱☕');
 }
 
 function initPerformanceMonitor() {

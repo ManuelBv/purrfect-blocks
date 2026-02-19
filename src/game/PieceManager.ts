@@ -35,7 +35,7 @@ export class PieceManager {
     return this.availablePieces[index];
   }
 
-  consumePiece(index: number, comboMultiplier: number = 1.0): Piece | null {
+  consumePiece(index: number): Piece | null {
     if (index < 0 || index >= this.availablePieces.length) {
       return null;
     }
@@ -81,8 +81,8 @@ export class PieceManager {
   hasPlayablePieces(board: GameBoard): boolean {
     for (const piece of this.availablePieces) {
       // Try to place this piece at every position on the board
-      for (let row = 0; row < 18; row++) {
-        for (let col = 0; col < 12; col++) {
+      for (let row = 0; row < board.rows; row++) {
+        for (let col = 0; col < board.cols; col++) {
           if (board.canPlacePiece(piece.shape, row, col)) {
             return true; // Found at least one valid placement
           }

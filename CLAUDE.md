@@ -44,10 +44,10 @@ src/
 
 ## Game Mechanics
 
-- **Grid:** 12×18 cells, responsive sizing
-- **Pieces:** 22 types (16 tetrominoes + 4 squares + bombs)
-- **Scoring:** 100 points/line × cascade multiplier (1.5x per level)
-- **Bombs:** 1×1 yarn balls → 3×3 explosion (50 pts/block)
+- **Grid:** 8×8 cells, responsive sizing
+- **Pieces:** 19 types (16 tetromino rotations: L×4, I×4, F×4, T×4) + (3 squares: 1×1, 2×2, 3×3) + bombs
+- **Scoring:** 100 points/line × streak multiplier (+0.5x per consecutive clearing turn); streak resets when a placement causes no clear
+- **Bombs:** 1×1 yarn balls → 3×3 explosion (50 pts/block); spawned every 3–5 turns by PieceManager (independent of streak)
 
 ## Performance
 
@@ -131,7 +131,7 @@ The cat-builder agent uses this skill internally to process screenshots.
 
 | File | Purpose |
 |------|---------|
-| `src/game/GamePhase2.ts` | Main game controller |
+| `src/game/Game.ts` | Main game controller |
 | `src/game/GameBoard.ts` | Grid state and placement |
 | `src/game/CascadeEngine.ts` | Line clearing and combos |
 | `src/rendering/CatRenderer.ts` | Cat sprite matrices and rendering |
