@@ -98,6 +98,7 @@ export class Game {
     this.audioEngine = new AudioEngine();
     this.audioEngine.init();
     this.soundEffects = new SoundEffects(this.audioEngine);
+    this.soundEffects.initCatVoice();
 
     // Resume audio on first user interaction
     document.addEventListener('click', () => {
@@ -186,6 +187,13 @@ export class Game {
       { id: 'test-game-over', handler: () => this.soundEffects.playGameOver() },
       { id: 'test-success', handler: () => this.soundEffects.playSuccess() },
       { id: 'test-invalid', handler: () => this.soundEffects.playInvalid() },
+      // Formant-based cat voice synth (new — for A/B comparison)
+      { id: 'test-cat-meow-happy', handler: () => this.soundEffects.playCatMeowHappy() },
+      { id: 'test-cat-meow-sad', handler: () => this.soundEffects.playCatMeowSad() },
+      { id: 'test-cat-meow-excited', handler: () => this.soundEffects.playCatMeowExcited() },
+      { id: 'test-cat-purr', handler: () => this.soundEffects.playCatPurr() },
+      { id: 'test-cat-hiss', handler: () => this.soundEffects.playCatHiss() },
+      { id: 'test-cat-chirp', handler: () => this.soundEffects.playCatChirp(3) },
     ];
 
     buttons.forEach(({ id, handler }) => {

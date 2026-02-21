@@ -71,6 +71,20 @@ export class AudioEngine {
   }
 
   /**
+   * Expose AudioContext for CatVoiceSynth to connect to the audio graph
+   */
+  getContext(): AudioContext | null {
+    return this.context;
+  }
+
+  /**
+   * Expose master gain node for CatVoiceSynth to connect to
+   */
+  getMasterGain(): GainNode | null {
+    return this.masterGain;
+  }
+
+  /**
    * Play a simple tone
    */
   playTone(frequency: number, duration: number, type: OscillatorType = 'sine'): void {

@@ -1,12 +1,52 @@
 // Game sound effects using Web Audio API
 
 import { AudioEngine } from './AudioEngine';
+import { CatVoiceSynth, MEOW_HAPPY, MEOW_SAD, MEOW_EXCITED } from './CatVoiceSynth';
 
 export class SoundEffects {
   private audioEngine: AudioEngine;
+  private _catVoice: CatVoiceSynth | null = null;
 
   constructor(audioEngine: AudioEngine) {
     this.audioEngine = audioEngine;
+  }
+
+  /**
+   * Initialize the formant-based cat voice synthesizer.
+   * Must be called after AudioEngine.init() (requires AudioContext to exist).
+   */
+  initCatVoice(): void {
+    const ctx = this.audioEngine.getContext();
+    const masterGain = this.audioEngine.getMasterGain();
+    if (ctx && masterGain) {
+      this._catVoice = new CatVoiceSynth(ctx, masterGain);
+    }
+  }
+
+  // ─── New formant-based cat sounds (separate from existing methods) ──────────
+
+  playCatMeowHappy(): void {
+    this._catVoice?.meow(MEOW_HAPPY);
+  }
+
+  playCatMeowSad(): void {
+    this._catVoice?.meow(MEOW_SAD);
+  }
+
+  playCatMeowExcited(): void {
+    this._catVoice?.meow(MEOW_EXCITED);
+  }
+
+  playCatPurr(duration?: number): void {
+    this._catVoice?.purr(duration);
+  }
+
+  playCatHiss(duration?: number): void {
+    this._catVoice?.hiss(duration);
+  }
+
+  playCatChirp(count?: number): void {
+    this._catVoice?.chirp(count);
   }
 
   /**
