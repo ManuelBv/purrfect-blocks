@@ -12,6 +12,7 @@ A cozy block puzzle game with a warm coffee shop aesthetic and interactive cats.
 - Interactive cats that react to your moves
 - Coffee shop color palette
 - Full accessibility support
+- Procedural cat vocal synthesis via Web Audio API (no audio files)
 
 ## Development
 
@@ -93,6 +94,17 @@ Type the skill command in a Claude Code conversation:
 /tdd          # Start a TDD session for a feature or bug fix
 /build-cats   # Convert a pixel art image into a sprite matrix
 ```
+
+## Audio System
+
+Cat sounds are synthesized procedurally via the Web Audio API — no MP3/WAV files. Two layers:
+
+- **Legacy sounds** (`SoundEffects.ts`) — simple oscillator tones for piece placement, game over, etc.
+- **Formant synthesis** (`CatVoiceSynth.ts`) — source-filter vocal model with smooth pitch glides, 3 bandpass formant filters, and vibrato for realistic cat-like timbre. Sounds: `meow()` (happy/sad/excited), `purr()`, `hiss()`, `chirp()`.
+
+Enable **Dev Mode** in settings to access the audio test panel and A/B compare both sound systems.
+
+Research notes: `docs/research-cat-vocal-synthesis.md`
 
 ## Tech Stack
 

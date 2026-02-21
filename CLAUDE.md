@@ -21,7 +21,7 @@ A cozy block puzzle web game (like 1010!/Block Blast, NOT Tetris) with coffee sh
 
 ```
 src/
-├── audio/      # AudioEngine, SoundEffects
+├── audio/      # AudioEngine, SoundEffects, CatVoiceSynth
 ├── board/      # Cell, CollisionDetector, GridManager
 ├── entities/   # Cat companion system
 ├── game/       # GamePhase2, GameBoard, CascadeEngine, LineDetector, PieceManager, ScoreManager
@@ -48,6 +48,28 @@ src/
 - **Pieces:** 19 types (16 tetromino rotations: L×4, I×4, F×4, T×4) + (3 squares: 1×1, 2×2, 3×3) + bombs
 - **Scoring:** 100 points/line × streak multiplier (+0.5x per consecutive clearing turn); streak resets when a placement causes no clear
 - **Bombs:** 1×1 yarn balls → 3×3 explosion (50 pts/block); spawned every 3–5 turns by PieceManager (independent of streak)
+
+## Audio Architecture
+
+Two-layer audio system — both coexist, formant layer is NOT yet wired to game events:
+
+| Layer | File | Status |
+|-------|------|--------|
+| Legacy | `src/audio/SoundEffects.ts` | Active in-game — simple oscillator tones |
+| Formant synthesis | `src/audio/CatVoiceSynth.ts` | Built, dev-only until user approves sounds |
+
+**CatVoiceSynth** uses source-filter vocal model: sawtooth source → lowpass pre-filter → 3 bandpass formant filters → ADSR. Methods: `meow(MeowParams)`, `purr()`, `hiss()`, `chirp(count)`. Presets: `MEOW_HAPPY`, `MEOW_SAD`, `MEOW_EXCITED`.
+
+**Integration pattern:**
+- `AudioEngine.getContext()` / `getMasterGain()` expose the audio graph for `CatVoiceSynth` to connect to
+- `SoundEffects.initCatVoice()` must be called after `AudioEngine.init()`
+- New methods: `playCatMeowHappy/Sad/Excited()`, `playCatPurr()`, `playCatHiss()`, `playCatChirp()`
+
+**Next step:** user tests sounds via dev mode panel, then decides which game events to swap.
+
+**Testing:** Web Audio API mocked at boundary — `createMockAudioContext()` in test files tracks oscillator/filter creation. See `tests/unit/CatVoiceSynth.test.ts` and `CatVoiceSynthSoundEffects.test.ts`.
+
+Research: `docs/research-cat-vocal-synthesis.md` | Progress: `docs/cat-voice-synth-progress.md`
 
 ## Performance
 
