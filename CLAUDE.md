@@ -140,14 +140,38 @@ Custom skills in `.claude/skills/`:
 | Skill | Purpose |
 |-------|---------|
 | `/build-cats` | Convert pixel art images to sprite matrices |
+| `/agent-browser` | Browser automation — navigate, click, fill forms, screenshot, scrape |
 
 ### Using Skills
 
 ```
 /build-cats [path-to-image]
+/agent-browser   # triggers browser automation workflow
 ```
 
-The cat-builder agent uses this skill internally to process screenshots.
+The cat-builder agent uses `/build-cats` internally to process screenshots.
+
+### agent-browser
+
+Use the `/agent-browser` skill whenever the user asks to:
+- Open or visit a website
+- Click buttons, fill forms, or interact with a page
+- Take screenshots or record browser sessions
+- Scrape or extract data from pages
+- Test the game in a browser
+- Automate any browser task
+
+**Default mode: headed** — always pass `--headed` (or set `AGENT_BROWSER_HEADED=1`) so the user can watch the browser while automation runs.
+
+**Never close the browser** — do NOT run `agent-browser close` unless the user explicitly asks to close it.
+
+```bash
+# Always use headed mode
+agent-browser --headed open <url>
+
+# Or set env var at the top of any browser session
+export AGENT_BROWSER_HEADED=1
+```
 
 ## Key Files
 
